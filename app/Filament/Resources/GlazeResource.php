@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SubCategoryResource\Pages;
-use App\Filament\Resources\SubCategoryResource\RelationManagers;
-use App\Models\SubCategory;
+use App\Filament\Resources\GlazeResource\Pages;
+use App\Filament\Resources\GlazeResource\RelationManagers;
+use App\Models\Glaze;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
@@ -15,9 +14,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SubCategoryResource extends Resource
+class GlazeResource extends Resource
 {
-    protected static ?string $model = SubCategory::class;
+    protected static ?string $model = Glaze::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -25,20 +24,13 @@ class SubCategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->required()
-                    ->relationship('category', 'name')
-                    ->live(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
                     ->unique(
-                        table: SubCategory::class,
+                        table: Glaze::class,
                         ignoreRecord: true,
-                    )
-                    ->disabled(function (Get $get) {
-                        return !filled($get('category_id'));
-                    }),
+                    ),
             ])->columns(1);
     }
 
@@ -46,9 +38,8 @@ class SubCategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Principal Category'),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
             ])
             ->filters([
                 //
@@ -68,7 +59,7 @@ class SubCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageSubCategories::route('/'),
+            'index' => Pages\ManageGlazes::route('/'),
         ];
     }
 }

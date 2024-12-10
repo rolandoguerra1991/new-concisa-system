@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Glaze extends Model
 {
     protected $fillable = ['name'];
 
@@ -18,9 +18,5 @@ class Category extends Model
         return [
             'name' => 'string',
         ];
-    }
-
-    public function subCategories() {
-        return $this->hasMany(SubCategory::class);
     }
 }
