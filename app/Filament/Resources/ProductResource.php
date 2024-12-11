@@ -17,7 +17,9 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
@@ -49,7 +51,10 @@ class ProductResource extends Resource
                         $set('glaze_id', null);
                         $set('classification_id', null);
                     })
-                    ->live(),
+                    ->live()
+                    ->disabled(function (Get $get) {
+                        return !filled($get('category_id'));
+                    }),
                 Forms\Components\Select::make('glaze_id')
                     ->label('Glaze')
                     ->required()
@@ -59,7 +64,10 @@ class ProductResource extends Resource
                         modifyQueryUsing: function (Builder $query, Get $get) {
                             return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
                         }
-                    ),
+                    )
+                    ->disabled(function (Get $get) {
+                        return !filled($get('sub_category_id'));
+                    }),
                 Forms\Components\Select::make('classification_id')
                     ->label('Classification')
                     ->required()
@@ -70,22 +78,30 @@ class ProductResource extends Resource
                             return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
                         }
                     )
-                    ->live(),
+                    ->live()
+                    ->disabled(function (Get $get) {
+                        return !filled($get('sub_category_id'));
+                    }),
                 Forms\Components\TextInput::make('price_per_kg')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->suffixIcon('heroicon-o-currency-euro'),
                 Forms\Components\TextInput::make('code')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->suffixIcon('heroicon-o-identification'),
                 Forms\Components\TextInput::make('quantity_boxes')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->suffixIcon('heroicon-o-cube'),
                 Forms\Components\TextInput::make('weight_per_box')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->suffixIcon('heroicon-o-scale'),
                 Forms\Components\TextInput::make('palette_dimensions')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->suffixIcon('heroicon-o-squares-2x2'),
             ]);
     }
 
