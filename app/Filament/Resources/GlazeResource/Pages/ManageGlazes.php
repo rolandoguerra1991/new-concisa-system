@@ -15,7 +15,11 @@ class ManageGlazes extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
-                ->modalWidth(MaxWidth::Medium),
+                ->modalWidth(MaxWidth::Medium)
+                ->mutateFormDataUsing(function(array $data) {
+                    $data['name'] = "$data[name] ($data[sub_category_name])";
+                    return $data;
+                }),
         ];
     }
 }
