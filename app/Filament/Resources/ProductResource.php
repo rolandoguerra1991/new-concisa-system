@@ -36,6 +36,8 @@ class ProductResource extends Resource
                     ->afterStateUpdated(function (Set $set) {
                         $set('sub_category_id', null);
                         $set('classification_id', null);
+                    })->disabled(function() {
+                        return auth()->user()->isEditor();
                     }),
                 Forms\Components\Select::make('sub_category_id')
                     ->label('Sub categoria')
@@ -53,7 +55,7 @@ class ProductResource extends Resource
                     })
                     ->live()
                     ->disabled(function (Get $get) {
-                        return !filled($get('category_id'));
+                        return !filled($get('category_id')) || auth()->user()->isEditor();
                     }),
                 Forms\Components\Select::make('glaze_id')
                     ->label('Glaseo')
@@ -66,7 +68,7 @@ class ProductResource extends Resource
                         }
                     )
                     ->disabled(function (Get $get) {
-                        return !filled($get('sub_category_id'));
+                        return !filled($get('sub_category_id')) || auth()->user()->isEditor();
                     }),
                 Forms\Components\Select::make('classification_id')
                     ->label('Clasificacion')
@@ -80,7 +82,7 @@ class ProductResource extends Resource
                     )
                     ->live()
                     ->disabled(function (Get $get) {
-                        return !filled($get('sub_category_id'));
+                        return !filled($get('sub_category_id')) || auth()->user()->isEditor();
                     }),
                 Forms\Components\TextInput::make('price_per_kg')
                     ->label('Precio por kg')
@@ -91,22 +93,34 @@ class ProductResource extends Resource
                     ->label('Codigo')
                     ->required()
                     ->numeric()
-                    ->suffixIcon('heroicon-o-identification'),
+                    ->suffixIcon('heroicon-o-identification')
+                    ->disabled(function() {
+                        return auth()->user()->isEditor();
+                    }),
                 Forms\Components\TextInput::make('quantity_boxes')
                     ->label('Cantidad de cajas')
                     ->required()
                     ->numeric()
-                    ->suffixIcon('heroicon-o-cube'),
+                    ->suffixIcon('heroicon-o-cube')
+                    ->disabled(function() {
+                        return auth()->user()->isEditor();
+                    }),
                 Forms\Components\TextInput::make('weight_per_box')
                     ->label('Peso por caja')
                     ->required()
                     ->maxLength(255)
-                    ->suffixIcon('heroicon-o-scale'),
+                    ->suffixIcon('heroicon-o-scale')
+                    ->disabled(function() {
+                        return auth()->user()->isEditor();
+                    }),
                 Forms\Components\TextInput::make('palette_dimensions')
                     ->label('Dimensiones de la paleta')
                     ->required()
                     ->maxLength(255)
-                    ->suffixIcon('heroicon-o-squares-2x2'),
+                    ->suffixIcon('heroicon-o-squares-2x2')
+                    ->disabled(function() {
+                        return auth()->user()->isEditor();
+                    }),
             ]);
     }
 
