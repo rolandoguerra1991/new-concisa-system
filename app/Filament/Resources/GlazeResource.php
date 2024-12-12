@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GlazeResource\Pages;
-use App\Filament\Resources\GlazeResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Glaze;
 use App\Models\SubCategory;
@@ -17,7 +16,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class GlazeResource extends Resource
 {
@@ -45,7 +43,7 @@ class GlazeResource extends Resource
                         }
                     }),
                 Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub category')
+                    ->label('Sub categoria')
                     ->required()
                     ->relationship(
                         name: 'subCategory',
@@ -65,6 +63,7 @@ class GlazeResource extends Resource
                     }),
                 Forms\Components\Hidden::make('sub_category_name'),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255)
                     ->unique(
@@ -83,7 +82,8 @@ class GlazeResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Nombre'),
             ])
             ->filters([
                 //
@@ -109,5 +109,20 @@ class GlazeResource extends Resource
         return [
             'index' => Pages\ManageGlazes::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Glaseos';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Glaseo';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Glaseos';
     }
 }

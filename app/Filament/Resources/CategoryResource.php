@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,8 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryResource extends Resource
 {
@@ -27,6 +24,7 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->unique(
                         table: Category::class,
                         ignoreRecord: true,
@@ -41,6 +39,7 @@ class CategoryResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
             ])
             ->filters([
@@ -63,5 +62,20 @@ class CategoryResource extends Resource
         return [
             'index' => Pages\ManageCategories::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Categorías';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Categoria';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Categorias';
     }
 }

@@ -26,7 +26,7 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('category_id')
-                    ->label('Principal category')
+                    ->label('Categoria principal')
                     ->required()
                     ->relationship(
                         name: 'category',
@@ -38,7 +38,7 @@ class ProductResource extends Resource
                         $set('classification_id', null);
                     }),
                 Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub category')
+                    ->label('Sub categoria')
                     ->required()
                     ->relationship(
                         name: 'subCategory',
@@ -56,7 +56,7 @@ class ProductResource extends Resource
                         return !filled($get('category_id'));
                     }),
                 Forms\Components\Select::make('glaze_id')
-                    ->label('Glaze')
+                    ->label('Glaseo')
                     ->required()
                     ->relationship(
                         name: 'glaze',
@@ -69,7 +69,7 @@ class ProductResource extends Resource
                         return !filled($get('sub_category_id'));
                     }),
                 Forms\Components\Select::make('classification_id')
-                    ->label('Classification')
+                    ->label('Clasificacion')
                     ->required()
                     ->relationship(
                         name: 'classification',
@@ -83,22 +83,27 @@ class ProductResource extends Resource
                         return !filled($get('sub_category_id'));
                     }),
                 Forms\Components\TextInput::make('price_per_kg')
+                    ->label('Precio por kg')
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-currency-euro'),
                 Forms\Components\TextInput::make('code')
+                    ->label('Codigo')
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-identification'),
                 Forms\Components\TextInput::make('quantity_boxes')
+                    ->label('Cantidad de cajas')
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-cube'),
                 Forms\Components\TextInput::make('weight_per_box')
+                    ->label('Peso por caja')
                     ->required()
                     ->maxLength(255)
                     ->suffixIcon('heroicon-o-scale'),
                 Forms\Components\TextInput::make('palette_dimensions')
+                    ->label('Dimensiones de la paleta')
                     ->required()
                     ->maxLength(255)
                     ->suffixIcon('heroicon-o-squares-2x2'),
@@ -110,15 +115,15 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('category.name'),
-                Tables\Columns\TextColumn::make('subCategory.name'),
-                Tables\Columns\TextColumn::make('glaze.name'),
-                Tables\Columns\TextColumn::make('classification.name'),
-                Tables\Columns\TextColumn::make('price_per_kg'),
-                Tables\Columns\TextColumn::make('code'),
-                Tables\Columns\TextColumn::make('quantity_boxes'),
-                Tables\Columns\TextColumn::make('weight_per_box'),
-                Tables\Columns\TextColumn::make('palette_dimensions'),
+                Tables\Columns\TextColumn::make('category.name')->label('Categoria principal'),
+                Tables\Columns\TextColumn::make('subCategory.name')->label('Sub categoria'),
+                Tables\Columns\TextColumn::make('glaze.name')->label('Glaseo'),
+                Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion'),
+                Tables\Columns\TextColumn::make('price_per_kg')->label('Precio por kg'),
+                Tables\Columns\TextColumn::make('code')->label('Codigo'),
+                Tables\Columns\TextColumn::make('quantity_boxes')->label('Cantidad de cajas'),
+                Tables\Columns\TextColumn::make('weight_per_box')->label('Peso por caja'),
+                Tables\Columns\TextColumn::make('palette_dimensions')->label('Dimensiones de la paleta'),
             ])
             ->filters([
                 //
@@ -147,5 +152,20 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Productos';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Producto';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Productos';
     }
 }

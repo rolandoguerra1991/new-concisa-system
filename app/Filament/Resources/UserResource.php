@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,9 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
@@ -28,13 +25,16 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
+                    ->label('Correo electrónico')
                     ->email()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
+                    ->label('Contraseña')
                     ->password()
                     ->required(function(?Model $record) {
                         return is_null($record);
@@ -44,13 +44,14 @@ class UserResource extends Resource
                     })
                     ->maxLength(255),
                 Forms\Components\Radio::make('role')
+                    ->label('Rol')
                     ->options([
-                        'admin' => 'Administrator',
+                        'admin' => 'Administrador',
                         'editor' => 'Editor',
                     ])
                     ->descriptions([
-                        'admin' => 'Full access',
-                        'editor' => 'Can only search for products and edit prices and generate reports.',
+                        'admin' => 'Acceso total a la aplicación.',
+                        'editor' => 'Solo es capaz de editar, buscar y generar reportes.',
                     ])->required()
             ])->columns(1);
     }
@@ -61,17 +62,11 @@ class UserResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Correo electrónico')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('role'),
             ])
             ->filters([
@@ -94,5 +89,20 @@ class UserResource extends Resource
         return [
             'index' => Pages\ManageUsers::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Usuarios';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Usuario';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Usuarios';
     }
 }

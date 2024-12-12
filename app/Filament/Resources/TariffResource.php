@@ -3,17 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TariffResource\Pages;
-use App\Filament\Resources\TariffResource\RelationManagers;
 use App\Models\Tariff;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TariffResource extends Resource
 {
@@ -26,12 +22,15 @@ class TariffResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required(),
                 Forms\Components\TextInput::make('increase_amount')
+                    ->label('Monto de incremento')
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-currency-euro'),
                 Forms\Components\TextInput::make('increase_percentage')
+                    ->label('Porcentaje de incremento')
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-percent-badge')
@@ -42,10 +41,13 @@ class TariffResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre'),
                 Tables\Columns\TextColumn::make('increase_amount')
+                    ->label('Monto de incremento')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('increase_percentage')
+                    ->label('Porcentaje de incremento')
                     ->numeric(),
             ])
             ->filters([
@@ -68,5 +70,20 @@ class TariffResource extends Resource
         return [
             'index' => Pages\ManageTariffs::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Tarifas';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Tarifa';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Tarifas';
     }
 }

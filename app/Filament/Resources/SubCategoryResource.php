@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubCategoryResource\Pages;
-use App\Filament\Resources\SubCategoryResource\RelationManagers;
 use App\Models\SubCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,8 +11,6 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubCategoryResource extends Resource
 {
@@ -28,10 +25,12 @@ class SubCategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('category_id')
+                    ->label('Categoria principal')
                     ->required()
                     ->relationship('category', 'name')
                     ->live(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255)
                     ->unique(
@@ -49,9 +48,10 @@ class SubCategoryResource extends Resource
         return $table
             ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre'),
                 Tables\Columns\TextColumn::make('category.name')
-                    ->label('Principal Category'),
+                    ->label('Categoria principal'),
             ])
             ->filters([
                 //
@@ -73,5 +73,20 @@ class SubCategoryResource extends Resource
         return [
             'index' => Pages\ManageSubCategories::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Sub Categorías';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Sub Categoría';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Sub Categorías';
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClassificationResource\Pages;
-use App\Filament\Resources\ClassificationResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Classification;
 use Filament\Forms;
@@ -16,7 +15,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClassificationResource extends Resource
 {
@@ -31,7 +29,7 @@ class ClassificationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('category_id')
-                    ->label('Principal category')
+                    ->label('Categoria principal')
                     ->required()
                     ->options(Category::query()->pluck('name', 'id'))
                     ->live()
@@ -44,7 +42,7 @@ class ClassificationResource extends Resource
                         }
                     }),
                 Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub category')
+                    ->label('Sub categoria')
                     ->required()
                     ->relationship(
                         name: 'subCategory',
@@ -54,6 +52,7 @@ class ClassificationResource extends Resource
                         }
                     ),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255)
                     ->unique(
@@ -69,9 +68,10 @@ class ClassificationResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subCategory.name')
-                    ->label('Sub category')
+                    ->label('Sub categoria')
                     ->searchable(),
             ])
             ->filters([
@@ -94,5 +94,20 @@ class ClassificationResource extends Resource
         return [
             'index' => Pages\ManageClassifications::route('/'),
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Clasificaciones';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'Clasificacion';
+    }
+
+    public static function getPluralLabel(): ?string
+    {
+        return 'Clasificaciones';
     }
 }
