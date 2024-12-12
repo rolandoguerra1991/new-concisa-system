@@ -25,6 +25,7 @@ class AppPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->brandName('Sistema de tarifas')
             ->brandLogo(asset('img/LOGO-NEW-CONCISA.svg'))
             ->brandLogoHeight('8rem')
             ->id('app')
