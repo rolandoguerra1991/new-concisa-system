@@ -6,8 +6,8 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,101 +25,105 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->label('Categoria principal')
-                    ->required()
-                    ->relationship(
-                        name: 'category',
-                        titleAttribute: 'name',
-                    )
-                    ->live()
-                    ->afterStateUpdated(function (Set $set) {
-                        $set('sub_category_id', null);
-                        $set('classification_id', null);
-                    })->disabled(function() {
-                        return auth()->user()->isEditor();
-                    }),
-                Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub categoria')
-                    ->required()
-                    ->relationship(
-                        name: 'subCategory',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, Get $get) {
-                            return $query->where('category_id', '=', (int) $get('category_id'));
-                        }
-                    )
-                    ->afterStateUpdated(function (Set $set) {
-                        $set('glaze_id', null);
-                        $set('classification_id', null);
-                    })
-                    ->live()
-                    ->disabled(function (Get $get) {
-                        return !filled($get('category_id')) || auth()->user()->isEditor();
-                    }),
-                Forms\Components\Select::make('glaze_id')
-                    ->label('Glaseo')
-                    ->relationship(
-                        name: 'glaze',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, Get $get) {
-                            return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
-                        }
-                    )
-                    ->disabled(function (Get $get) {
-                        return !filled($get('sub_category_id')) || auth()->user()->isEditor();
-                    }),
-                Forms\Components\Select::make('classification_id')
-                    ->label('Clasificacion')
-                    ->required()
-                    ->relationship(
-                        name: 'classification',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, Get $get) {
-                            return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
-                        }
-                    )
-                    ->live()
-                    ->disabled(function (Get $get) {
-                        return !filled($get('sub_category_id')) || auth()->user()->isEditor();
-                    }),
-                Forms\Components\TextInput::make('price_per_kg')
-                    ->label('Precio por kg')
-                    ->required()
-                    ->numeric()
-                    ->suffixIcon('heroicon-o-currency-euro'),
-                Forms\Components\TextInput::make('code')
-                    ->label('Codigo')
-                    ->required()
-                    ->numeric()
-                    ->suffixIcon('heroicon-o-identification')
-                    ->disabled(function() {
-                        return auth()->user()->isEditor();
-                    }),
-                Forms\Components\TextInput::make('quantity_boxes')
-                    ->label('Cantidad de cajas')
-                    ->required()
-                    ->numeric()
-                    ->suffixIcon('heroicon-o-cube')
-                    ->disabled(function() {
-                        return auth()->user()->isEditor();
-                    }),
-                Forms\Components\TextInput::make('weight_per_box')
-                    ->label('Peso por caja')
-                    ->required()
-                    ->maxLength(255)
-                    ->suffixIcon('heroicon-o-scale')
-                    ->disabled(function() {
-                        return auth()->user()->isEditor();
-                    }),
-                Forms\Components\TextInput::make('palette_dimensions')
-                    ->label('Dimensiones de la paleta')
-                    ->required()
-                    ->maxLength(255)
-                    ->suffixIcon('heroicon-o-squares-2x2')
-                    ->disabled(function() {
-                        return auth()->user()->isEditor();
-                    }),
+                Forms\Components\Section::make()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('category_id')
+                            ->label('Categoria principal')
+                            ->required()
+                            ->relationship(
+                                name: 'category',
+                                titleAttribute: 'name',
+                            )
+                            ->live()
+                            ->afterStateUpdated(function (Set $set) {
+                                $set('sub_category_id', null);
+                                $set('classification_id', null);
+                            })->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                        Forms\Components\Select::make('sub_category_id')
+                            ->label('Sub categoria')
+                            ->required()
+                            ->relationship(
+                                name: 'subCategory',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, Get $get) {
+                                    return $query->where('category_id', '=', (int) $get('category_id'));
+                                }
+                            )
+                            ->afterStateUpdated(function (Set $set) {
+                                $set('glaze_id', null);
+                                $set('classification_id', null);
+                            })
+                            ->live()
+                            ->disabled(function (Get $get) {
+                                return ! filled($get('category_id')) || auth()->user()->isEditor();
+                            }),
+                        Forms\Components\Select::make('glaze_id')
+                            ->label('Glaseo')
+                            ->relationship(
+                                name: 'glaze',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, Get $get) {
+                                    return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
+                                }
+                            )
+                            ->disabled(function (Get $get) {
+                                return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
+                            }),
+                        Forms\Components\Select::make('classification_id')
+                            ->label('Clasificacion')
+                            ->required()
+                            ->relationship(
+                                name: 'classification',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, Get $get) {
+                                    return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
+                                }
+                            )
+                            ->live()
+                            ->disabled(function (Get $get) {
+                                return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
+                            }),
+                        Forms\Components\TextInput::make('price_per_kg')
+                            ->label('Precio por kg')
+                            ->required()
+                            ->numeric()
+                            ->suffixIcon('heroicon-o-currency-euro'),
+                        Forms\Components\TextInput::make('code')
+                            ->label('Codigo')
+                            ->required()
+                            ->numeric()
+                            ->suffixIcon('heroicon-o-identification')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                        Forms\Components\TextInput::make('quantity_boxes')
+                            ->label('Cantidad de cajas')
+                            ->required()
+                            ->numeric()
+                            ->suffixIcon('heroicon-o-cube')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                        Forms\Components\TextInput::make('weight_per_box')
+                            ->label('Peso por caja')
+                            ->required()
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-scale')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                        Forms\Components\TextInput::make('palette_dimensions')
+                            ->label('Dimensiones de la paleta')
+                            ->required()
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-squares-2x2')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                    ]),
             ]);
     }
 
@@ -128,12 +132,12 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('category.name')->label('Categoria principal'),
-                Tables\Columns\TextColumn::make('subCategory.name')->label('Sub categoria'),
-                Tables\Columns\TextColumn::make('glaze.name')->label('Glaseo'),
-                Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion'),
-                Tables\Columns\TextColumn::make('price_per_kg')->label('Precio por kg'),
-                Tables\Columns\TextColumn::make('code')->label('Codigo'),
+                Tables\Columns\TextColumn::make('category.name')->label('Categoria principal')->searchable(),
+                Tables\Columns\TextColumn::make('subCategory.name')->label('Sub categoria')->searchable(),
+                Tables\Columns\TextColumn::make('glaze.name')->label('Glaseo')->searchable(),
+                Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion')->searchable(),
+                Tables\Columns\TextColumn::make('price_per_kg')->label('Precio por kg')->searchable(),
+                Tables\Columns\TextColumn::make('code')->label('Codigo')->searchable(),
                 Tables\Columns\TextColumn::make('quantity_boxes')->label('Cantidad de cajas'),
                 Tables\Columns\TextColumn::make('weight_per_box')->label('Peso por caja'),
                 Tables\Columns\TextColumn::make('palette_dimensions')->label('Dimensiones de la paleta'),

@@ -38,7 +38,7 @@ class SubCategoryResource extends Resource
                         ignoreRecord: true,
                     )
                     ->disabled(function (Get $get) {
-                        return !filled($get('category_id'));
+                        return ! filled($get('category_id'));
                     }),
             ])->columns(1);
     }
@@ -49,9 +49,11 @@ class SubCategoryResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nombre'),
+                    ->label('Nombre')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
-                    ->label('Categoria principal'),
+                    ->label('Categoria principal')
+                    ->searchable(),
             ])
             ->filters([
                 //

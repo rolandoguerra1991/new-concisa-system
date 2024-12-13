@@ -33,7 +33,7 @@ class TariffResource extends Resource
                     ->label('Porcentaje de incremento')
                     ->required()
                     ->numeric()
-                    ->suffixIcon('heroicon-o-percent-badge')
+                    ->suffixIcon('heroicon-o-percent-badge'),
             ])->columns(1);
     }
 
@@ -43,13 +43,16 @@ class TariffResource extends Resource
             ->striped()
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nombre'),
+                    ->label('Nombre')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('increase_amount')
                     ->label('Monto de incremento')
-                    ->numeric(),
+                    ->numeric()
+                    ->suffix('€'),
                 Tables\Columns\TextColumn::make('increase_percentage')
                     ->label('Porcentaje de incremento')
-                    ->numeric(),
+                    ->numeric()
+                    ->suffix('%'),
             ])
             ->filters([
                 //
