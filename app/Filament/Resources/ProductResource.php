@@ -59,7 +59,6 @@ class ProductResource extends Resource
                     }),
                 Forms\Components\Select::make('glaze_id')
                     ->label('Glaseo')
-                    ->required()
                     ->relationship(
                         name: 'glaze',
                         titleAttribute: 'name',
