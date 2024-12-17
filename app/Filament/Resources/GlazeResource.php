@@ -52,16 +52,7 @@ class GlazeResource extends Resource
                             return $query->where('category_id', '=', (int) $get('category_id'));
                         }
                     )
-                    ->live()
-                    ->afterStateUpdated(function (Set $set, Get $get, ?Model $record) {
-                        $subCategory = SubCategory::select('name')->where('id', '=', $get('sub_category_id'))->first();
-                        $set('sub_category_name', !is_null($subCategory) ? $subCategory->name : null);
-
-                        if($record) {
-                            $set('name', null);
-                        }
-                    }),
-                Forms\Components\Hidden::make('sub_category_name'),
+                    ->live(),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()
@@ -69,10 +60,7 @@ class GlazeResource extends Resource
                     ->unique(
                         table: Glaze::class,
                         ignoreRecord: true,
-                    )->suffix(function(Get $get) {
-                        $name = $get('sub_category_name');
-                        return  is_null($name) ? false : "($name)";
-                    }),
+                    )
             ])->columns(1);
     }
 
@@ -90,11 +78,7 @@ class GlazeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->modalWidth(MaxWidth::Medium)
-                    ->mutateFormDataUsing(function(array $data) {
-                        $data['name'] = "$data[name] ($data[sub_category_name])";
-                        return $data;
-                    }),
+                    ->modalWidth(MaxWidth::Medium),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
