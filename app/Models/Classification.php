@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Classification extends Model
 {
-    protected $fillable = ['name', 'sub_category_id'];
+    protected $fillable = ['name'];
 
     /**
      * Get the attributes that should be cast.
@@ -17,12 +17,11 @@ class Classification extends Model
     {
         return [
             'name' => 'string',
-            'sub_category_id'=> 'integer',
         ];
     }
 
-    public function subCategory()
+    public function subCategories()
     {
-        return $this->belongsTo(SubCategory::class);
+        return $this->belongsToMany(SubCategory::class);
     }
 }

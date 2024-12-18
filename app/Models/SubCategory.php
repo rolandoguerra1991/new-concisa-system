@@ -20,7 +20,7 @@ class SubCategory extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function glazes() {
-        return $this->hasMany(Glaze::class);
+    public function classifications() {
+        return $this->belongsToMany(Classification::class);
     }
 }

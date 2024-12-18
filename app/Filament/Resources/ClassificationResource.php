@@ -34,18 +34,20 @@ class ClassificationResource extends Resource
                     ->options(Category::query()->pluck('name', 'id'))
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
-                        $set('sub_category_id', null);
+                        $set('subCategories', null);
                     })
                     ->afterStateHydrated(function(?Model $record, Forms\Components\Select $component, Set $set) {
                         if($record) {
-                            $component->state($record->subCategory->category_id);
+                            $component->state($record->subCategories->first()->category_id);
                         }
                     }),
-                Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub categoria')
+                Forms\Components\Select::make('subCategories')
+                    ->label('Sub categorias')
                     ->required()
+                    ->multiple()
+                    ->preload()
                     ->relationship(
-                        name: 'subCategory',
+                        name: 'subCategories',
                         titleAttribute: 'name',
                         modifyQueryUsing: function (Builder $query, Get $get) {
                             return $query->where('category_id', '=', (int) $get('category_id'));

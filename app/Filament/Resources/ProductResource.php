@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Classification;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -60,32 +61,24 @@ class ProductResource extends Resource
                             ->disabled(function (Get $get) {
                                 return ! filled($get('category_id')) || auth()->user()->isEditor();
                             }),
+                        Forms\Components\Select::make('classification_id')
+                            ->label('Clasificacion')
+                            ->required()
+                            ->options(function (Get $get) {
+                                return Classification::whereRelation('subCategories', 'sub_category_id', '=', $get('sub_category_id'))
+                                    ->get()
+                                    ->pluck('name', 'id');
+                            })
+                            ->live()
+                            ->disabled(function (Get $get) {
+                                return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
+                            }),
                         Forms\Components\Select::make('glaze_id')
                             ->label('Glaseo')
                             ->relationship(
                                 name: 'glaze',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: function (Builder $query, Get $get) {
-                                    return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
-                                }
-                            )
-                            ->disabled(function (Get $get) {
-                                return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
-                            }),
-                        Forms\Components\Select::make('classification_id')
-                            ->label('Clasificacion')
-                            ->required()
-                            ->relationship(
-                                name: 'classification',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function (Builder $query, Get $get) {
-                                    return $query->where('sub_category_id', '=', (int) $get('sub_category_id'));
-                                }
-                            )
-                            ->live()
-                            ->disabled(function (Get $get) {
-                                return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
-                            }),
+                            ),
                         Forms\Components\TextInput::make('price_per_kg')
                             ->label('Precio por kg')
                             ->required()

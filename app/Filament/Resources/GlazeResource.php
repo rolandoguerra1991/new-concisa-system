@@ -29,30 +29,6 @@ class GlazeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                ->label('Principal category')
-                    ->required()
-                    ->options(Category::query()->pluck('name', 'id'))
-                    ->live()
-                    ->afterStateUpdated(function (Set $set) {
-                        $set('sub_category_id', null);
-                    })
-                    ->afterStateHydrated(function(?Model $record, Forms\Components\Select $component, Set $set) {
-                        if($record) {
-                            $component->state($record->subCategory->category_id);
-                        }
-                    }),
-                Forms\Components\Select::make('sub_category_id')
-                    ->label('Sub categoria')
-                    ->required()
-                    ->relationship(
-                        name: 'subCategory',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: function (Builder $query, Get $get) {
-                            return $query->where('category_id', '=', (int) $get('category_id'));
-                        }
-                    )
-                    ->live(),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()

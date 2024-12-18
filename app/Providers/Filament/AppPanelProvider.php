@@ -59,7 +59,6 @@ class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->profile()
-            ->topNavigation()
             ->maxContentWidth(MaxWidth::Full);
     }
 }
