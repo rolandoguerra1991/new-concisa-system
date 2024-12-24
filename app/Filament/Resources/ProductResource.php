@@ -78,7 +78,10 @@ class ProductResource extends Resource
                             ->relationship(
                                 name: 'glaze',
                                 titleAttribute: 'name',
-                            ),
+                            )
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
                         Forms\Components\TextInput::make('price_per_kg')
                             ->label('Precio por kg')
                             ->required()
