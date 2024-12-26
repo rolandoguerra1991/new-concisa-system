@@ -36,8 +36,8 @@ class ClassificationResource extends Resource
                     ->afterStateUpdated(function (Set $set) {
                         $set('subCategories', null);
                     })
-                    ->afterStateHydrated(function(?Model $record, Forms\Components\Select $component, Set $set) {
-                        if($record) {
+                    ->afterStateHydrated(function (?Model $record, Forms\Components\Select $component, Set $set) {
+                        if ($record) {
                             $component->state($record->subCategories->first()->category_id);
                         }
                     }),
@@ -60,7 +60,7 @@ class ClassificationResource extends Resource
                     ->unique(
                         table: Classification::class,
                         ignoreRecord: true,
-                    )
+                    ),
             ])->columns(1);
     }
 
@@ -72,8 +72,10 @@ class ClassificationResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('subCategory.name')
-                    ->label('Sub categoria')
+                Tables\Columns\TextColumn::make('subCategories.name')
+                    ->label('Sub categorias')
+                    ->badge()
+                    ->separator(',')
                     ->searchable(),
             ])
             ->filters([
