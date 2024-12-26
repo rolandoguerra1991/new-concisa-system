@@ -61,6 +61,15 @@ class ProductResource extends Resource
                             ->disabled(function (Get $get) {
                                 return ! filled($get('category_id')) || auth()->user()->isEditor();
                             }),
+                        Forms\Components\Select::make('glaze_id')
+                            ->label('Glaseo')
+                            ->relationship(
+                                name: 'glaze',
+                                titleAttribute: 'name',
+                            )
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
                         Forms\Components\Select::make('classification_id')
                             ->label('Clasificacion')
                             ->required()
@@ -73,20 +82,30 @@ class ProductResource extends Resource
                             ->disabled(function (Get $get) {
                                 return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
                             }),
-                        Forms\Components\Select::make('glaze_id')
-                            ->label('Glaseo')
-                            ->relationship(
-                                name: 'glaze',
-                                titleAttribute: 'name',
-                            )
-                            ->disabled(function () {
-                                return auth()->user()->isEditor();
-                            }),
                         Forms\Components\TextInput::make('price_per_kg')
                             ->label('Precio por kg')
                             ->required()
                             ->numeric()
                             ->suffixIcon('heroicon-o-currency-euro'),
+                        Forms\Components\TextInput::make('net_price')
+                            ->label('Precio neto')
+                            ->numeric()
+                            ->suffixIcon('heroicon-o-currency-euro'),
+                        Forms\Components\TextInput::make('weight_per_box')
+                            ->label('Peso por caja')
+                            ->required()
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-scale')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
+                        Forms\Components\TextInput::make('net_weight')
+                            ->label('Peso neto')
+                            ->maxLength(255)
+                            ->suffixIcon('heroicon-o-scale')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            }),
                         Forms\Components\TextInput::make('code')
                             ->label('Codigo')
                             ->required()
@@ -100,14 +119,6 @@ class ProductResource extends Resource
                             ->required()
                             ->numeric()
                             ->suffixIcon('heroicon-o-cube')
-                            ->disabled(function () {
-                                return auth()->user()->isEditor();
-                            }),
-                        Forms\Components\TextInput::make('weight_per_box')
-                            ->label('Peso por caja')
-                            ->required()
-                            ->maxLength(255)
-                            ->suffixIcon('heroicon-o-scale')
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
                             }),
