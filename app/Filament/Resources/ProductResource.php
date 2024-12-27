@@ -109,7 +109,6 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('code')
                             ->label('Codigo')
                             ->required()
-                            ->numeric()
                             ->suffixIcon('heroicon-o-identification')
                             ->disabled(function () {
                                 return auth()->user()->isEditor();

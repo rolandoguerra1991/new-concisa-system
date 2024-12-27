@@ -21,15 +21,15 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'classification_id'=> 'integer',
-            'glaze_id'=> 'integer',
-            'code'=> 'integer',
-            'quantity_boxes'=> 'integer',
-            'price_per_kg'=> 'decimal:2',
-            'weight_per_box'=> 'string',
-            'palette_dimensions'=> 'string',
-            'category_id'=> 'integer',
-            'sub_category_id'=> 'integer',
+            'classification_id' => 'integer',
+            'glaze_id' => 'integer',
+            'code' => 'string',
+            'quantity_boxes' => 'integer',
+            'price_per_kg' => 'decimal:2',
+            'weight_per_box' => 'string',
+            'palette_dimensions' => 'string',
+            'category_id' => 'integer',
+            'sub_category_id' => 'integer',
         ];
     }
 
