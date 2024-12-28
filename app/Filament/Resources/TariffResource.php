@@ -61,6 +61,10 @@ class TariffResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->modalWidth(MaxWidth::Medium),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('generate-report')
+                    ->label('Generar reporte')
+                    ->icon('heroicon-o-document')
+                    ->url(fn (Tariff $tariff) => route('generate-report', $tariff)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

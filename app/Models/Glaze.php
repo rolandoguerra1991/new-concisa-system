@@ -19,4 +19,9 @@ class Glaze extends Model
             'name' => 'string',
         ];
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
