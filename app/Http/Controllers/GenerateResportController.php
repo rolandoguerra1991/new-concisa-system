@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Tariff;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class GenerateResportController extends Controller
@@ -42,7 +43,7 @@ class GenerateResportController extends Controller
                         'glaze_name' => $glaze ? $glaze->name : 'Sin glaseo',
                         'products' => $products->map(function ($product) {
                             return [
-                                'classification' => $product->classification?->name,
+                                'classification' => $product->classification?->name ?? 'Sin clasificación',
                                 'price_per_kg' => $product->price_per_kg,
                                 'weight_per_box' => $product->weight_per_box,
                                 'code' => $product->code,
@@ -55,5 +56,12 @@ class GenerateResportController extends Controller
 
             $data[] = $categoryData;
         }
+
+        $pdf = Pdf::loadView('pdf.tariffs', [
+            'data' => $data,
+        ]);
+
+        // return $pdf->download("{$tariff->name}.pdf");
+        return $pdf->stream();
     }
 }
