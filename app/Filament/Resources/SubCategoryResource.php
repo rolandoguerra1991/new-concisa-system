@@ -28,7 +28,9 @@ class SubCategoryResource extends Resource
                     ->label('Categoria principal')
                     ->required()
                     ->relationship('category', 'name')
-                    ->live(),
+                    ->live()
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()

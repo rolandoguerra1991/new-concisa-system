@@ -40,12 +40,15 @@ class ClassificationResource extends Resource
                         if ($record) {
                             $component->state($record->subCategories->first()->category_id);
                         }
-                    }),
+                    })
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\Select::make('subCategories')
                     ->label('Sub categorias')
                     ->required()
                     ->multiple()
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'subCategories',
                         titleAttribute: 'name',

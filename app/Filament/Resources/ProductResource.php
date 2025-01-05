@@ -42,7 +42,9 @@ class ProductResource extends Resource
                                 $set('classification_id', null);
                             })->disabled(function () {
                                 return auth()->user()->isEditor();
-                            }),
+                            })
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\Select::make('sub_category_id')
                             ->label('Sub categoria')
                             ->required()
@@ -60,7 +62,9 @@ class ProductResource extends Resource
                             ->live()
                             ->disabled(function (Get $get) {
                                 return ! filled($get('category_id')) || auth()->user()->isEditor();
-                            }),
+                            })
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\Select::make('glaze_id')
                             ->label('Glaseo')
                             ->relationship(
@@ -69,7 +73,9 @@ class ProductResource extends Resource
                             )
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
-                            }),
+                            })
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\Select::make('classification_id')
                             ->label('Clasificacion')
                             ->required()
@@ -81,7 +87,9 @@ class ProductResource extends Resource
                             ->live()
                             ->disabled(function (Get $get) {
                                 return ! filled($get('sub_category_id')) || auth()->user()->isEditor();
-                            }),
+                            })
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\TextInput::make('price_per_kg')
                             ->label('Precio por kg')
                             ->required()
