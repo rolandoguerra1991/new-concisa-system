@@ -1,0 +1,7 @@
+@import "/vendor/filament/filament/resources/css/theme.css";
+
+@config 'tailwind.config.js';
+
+input#data\.price_per_kg {
+    @apply bg-primary-100;
+}

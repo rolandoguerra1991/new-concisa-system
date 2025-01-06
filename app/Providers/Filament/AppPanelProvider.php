@@ -59,6 +59,8 @@ class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->profile()
-            ->maxContentWidth(MaxWidth::Full);
+            ->maxContentWidth(MaxWidth::Full)
+            ->viteTheme('resources/css/filament/app/theme.css')
+            ->darkMode(false);
     }
 }
