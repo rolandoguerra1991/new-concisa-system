@@ -13,7 +13,6 @@ $bg = public_path('img/PORTADA.jpg');
                 font-family: Arial, sans-serif;
                 width: 100%;
                 height: 100%;
-                margin: 0 auto;
                 text-align: center;
                 background: url("{{ $bg }}");
                 background-size: cover;
@@ -22,7 +21,9 @@ $bg = public_path('img/PORTADA.jpg');
     </header>
 <body>
     <div class="container">
-
+       <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem;">
+        {{ now()->format('d/m/Y') }}
+       </span>
     </div>
 </body>
 </html>

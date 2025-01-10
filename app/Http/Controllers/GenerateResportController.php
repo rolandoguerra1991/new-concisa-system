@@ -61,6 +61,7 @@ class GenerateResportController extends Controller
         }
 
         $pdf1 = Pdf::loadView('pdf.cover');
+
         $pdf1->save('cover.pdf', 'local');
 
         $pdf2 = Pdf::loadView('pdf.categories', compact('tariff', 'data'));
@@ -87,6 +88,7 @@ class GenerateResportController extends Controller
         }
 
         $combinedPdf = storage_path("app/private/{$tariff->name}.pdf");
+        $pdf->Output($combinedPdf, 'F');
 
         return response()->download($combinedPdf, "{$tariff->name}.pdf");
     }
