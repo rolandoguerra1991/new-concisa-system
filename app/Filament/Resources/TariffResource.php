@@ -64,7 +64,7 @@ class TariffResource extends Resource
                 Tables\Actions\Action::make('generate-report')
                     ->label('Generar reporte')
                     ->icon('heroicon-o-document')
-                    ->url(fn (Tariff $tariff) => route('generate-report', $tariff)),
+                    ->url(fn (Tariff $tariff) => route('generate-report', $tariff), true),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

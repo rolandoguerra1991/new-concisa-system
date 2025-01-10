@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use setasign\Fpdi\Fpdi;
 
 class GenerateResportController extends Controller
 {
@@ -51,17 +52,42 @@ class GenerateResportController extends Controller
                                 'palette_dimensions' => $product->palette_dimensions,
                             ];
                         })];
-                } $categoryData['sub_categories'][] = $subCategoryData;
+                }
+
+                $categoryData['sub_categories'][] = $subCategoryData;
             }
 
             $data[] = $categoryData;
         }
 
-        $pdf = Pdf::loadView('pdf.tariffs', [
-            'data' => $data,
-        ]);
+        $pdf1 = Pdf::loadView('pdf.cover');
+        $pdf1->save('cover.pdf', 'local');
 
-        // return $pdf->download("{$tariff->name}.pdf");
-        return $pdf->stream();
+        $pdf2 = Pdf::loadView('pdf.categories', compact('tariff', 'data'));
+        $pdf2->save('categories.pdf', 'local');
+
+        $pdf3 = Pdf::loadView('pdf.final');
+        $pdf3->save('final.pdf', 'local');
+
+        $pdf = new Fpdi;
+
+        $files = [
+            storage_path('app/private/cover.pdf'),
+            storage_path('app/private/categories.pdf'),
+            storage_path('app/private/final.pdf'),
+        ];
+
+        foreach ($files as $file) {
+            $pageCount = $pdf->setSourceFile($file);
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $templateId = $pdf->importPage($pageNo);
+                $pdf->AddPage();
+                $pdf->useTemplate($templateId);
+            }
+        }
+
+        $combinedPdf = storage_path("app/private/{$tariff->name}.pdf");
+
+        return response()->download($combinedPdf, "{$tariff->name}.pdf");
     }
 }
