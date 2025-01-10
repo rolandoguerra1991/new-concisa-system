@@ -42,10 +42,20 @@ class GenerateResportController extends Controller
                     $glaze = $products->first()->glaze;
                     $subCategoryData['products_by_glaze'][] = [
                         'glaze_name' => $glaze ? $glaze->name : 'Sin glaseo',
-                        'products' => $products->map(function ($product) {
+                        'products' => $products->map(function ($product) use ($tariff) {
+                            if ($tariff->increase_amount > 0) {
+                                $price_per_kg = $product->price_per_kg + $tariff->increase_amount;
+                                if ($tariff->increase_percentage > 0) {
+                                    $price_per_kg += $product->price_per_kg * ($tariff->increase_percentage / 100);
+                                }
+                            } else {
+                                $price_per_kg = $product->price_per_kg;
+                            }
+                            $price_per_kg = number_format($price_per_kg, 2, '.', '');
+
                             return [
                                 'classification' => $product->classification?->name ?? 'Sin clasificación',
-                                'price_per_kg' => $product->price_per_kg,
+                                'price_per_kg' => $price_per_kg,
                                 'weight_per_box' => $product->weight_per_box,
                                 'code' => $product->code,
                                 'quantity_boxes' => $product->quantity_boxes,

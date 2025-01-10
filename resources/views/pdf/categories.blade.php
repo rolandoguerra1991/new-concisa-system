@@ -56,7 +56,7 @@
                         @foreach ($glaze['products'] as $product)
                             <tr>
                                 <td style="background: red;color: #fff; font-weight: bold">{{ $product['classification'] }}</td>
-                                <td style="background: blue;color: #fff; font-weight: bold">{{ $product['price_per_kg'] }}</td>
+                                <td style="background: blue;color: #fff; font-weight: bold">{{ $product['price_per_kg'] }}€</td>
                                 <td>{{ $product['weight_per_box'] }}</td>
                                 <td>{{ $product['code'] }}</td>
                                 <td>{{ $product['quantity_boxes'] }}</td>
