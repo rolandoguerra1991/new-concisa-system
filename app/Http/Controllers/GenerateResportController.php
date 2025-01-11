@@ -43,15 +43,17 @@ class GenerateResportController extends Controller
                     $subCategoryData['products_by_glaze'][] = [
                         'glaze_name' => $glaze ? $glaze->name : 'Sin glaseo',
                         'products' => $products->map(function ($product) use ($tariff) {
+                            $price_per_kg = $product->price_per_kg;
+
                             if ($tariff->increase_amount > 0) {
-                                $price_per_kg = $product->price_per_kg + $tariff->increase_amount;
-                                if ($tariff->increase_percentage > 0) {
-                                    $price_per_kg += $product->price_per_kg * ($tariff->increase_percentage / 100);
-                                }
-                            } else {
-                                $price_per_kg = $product->price_per_kg;
+                                $price_per_kg += $tariff->increase_amount;
                             }
-                            $price_per_kg = number_format($price_per_kg, 2, '.', '');
+
+                            if ($tariff->increase_percentage > 0) {
+                                $price_per_kg += $price_per_kg * $tariff->increase_percentage / 100;
+                            }
+
+                            $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
 
                             return [
                                 'classification' => $product->classification?->name ?? 'Sin clasificación',
@@ -70,7 +72,7 @@ class GenerateResportController extends Controller
             $data[] = $categoryData;
         }
 
-        $pdf1 = Pdf::loadView('pdf.cover');
+        $pdf1 = Pdf::loadView('pdf.cover', ['name' => $tariff->name]);
 
         $pdf1->save('cover.pdf', 'local');
 
@@ -101,5 +103,27 @@ class GenerateResportController extends Controller
         $pdf->Output($combinedPdf, 'F');
 
         return response()->download($combinedPdf, "{$tariff->name}.pdf");
+    }
+
+    public function roundToFiveOrZero($number)
+    {
+        $integerPart = floor($number);
+        $decimalPart = $number - $integerPart;
+        $decimalPart = round($decimalPart, 2);
+
+        $cents = intval(($decimalPart * 100) % 10);
+
+        if ($cents == 1 || $cents == 2) {
+            $decimalPart = floor($decimalPart * 10) / 10;
+        } elseif ($cents == 3 || $cents == 4) {
+            $decimalPart = floor($decimalPart * 10) / 10 + 0.05;
+        } elseif ($cents == 6 || $cents == 7) {
+            $decimalPart = floor($decimalPart * 10) / 10 + 0.05;
+        } elseif ($cents == 8 || $cents == 9) {
+            $decimalPart = ceil($decimalPart * 10) / 10;
+        }
+        $final = $integerPart + $decimalPart;
+
+        return number_format($final, 2, '.', '');
     }
 }

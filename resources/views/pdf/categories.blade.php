@@ -5,6 +5,16 @@
         @page {
             font-size: 12px;
             font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        body {
+            background-image: url({{ public_path('img/FONDO_GENERICO.jpg') }});
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding-top: 170px;
+            padding-bottom: 100px;
+            padding-right: 40px;
+            padding-left: 40px;
         }
         table {
             width: 100%;
@@ -20,7 +30,6 @@
             text-align: left;
         }
         h2 {
-            font-size: 40px;
             font-weight: bold;
         }
         h4.glaze-title {
@@ -36,7 +45,7 @@
     </style>
 <body>
     @foreach ($data as $category)
-        <h2>{{ $category['category_name'] }}</h2>
+        <h1>{{ $category['category_name'] }}</h1>
         @foreach ($category['sub_categories'] as $subCategory)
             <h3>{{ $subCategory['sub_category_name'] }}</h3>
             @foreach ($subCategory['products_by_glaze'] as $glaze)
@@ -55,12 +64,12 @@
                     <tbody>
                         @foreach ($glaze['products'] as $product)
                             <tr>
-                                <td style="background: red;color: #fff; font-weight: bold">{{ $product['classification'] }}</td>
-                                <td style="background: blue;color: #fff; font-weight: bold">{{ $product['price_per_kg'] }}€</td>
-                                <td>{{ $product['weight_per_box'] }}</td>
-                                <td>{{ $product['code'] }}</td>
-                                <td>{{ $product['quantity_boxes'] }}</td>
-                                <td>{{ $product['palette_dimensions'] }}</td>
+                                <td style="background: #8E0000;color: #fff; font-weight: bold">{{ $product['classification'] }}</td>
+                                <td style="background: #02548C;color: #fff; font-weight: bold">{{ $product['price_per_kg'] }}€</td>
+                                <td style="background: #fff">{{ $product['weight_per_box'] }}</td>
+                                <td style="background: #fff">{{ $product['code'] }}</td>
+                                <td style="background: #fff">{{ $product['quantity_boxes'] }}</td>
+                                <td style="background: #fff">{{ $product['palette_dimensions'] }}</td>
                             </tr>
                         @endforeach
                     </tbody>
