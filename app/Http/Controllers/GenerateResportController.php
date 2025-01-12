@@ -62,6 +62,8 @@ class GenerateResportController extends Controller
                                 'code' => $product->code,
                                 'quantity_boxes' => $product->quantity_boxes,
                                 'palette_dimensions' => $product->palette_dimensions,
+                                'net_price' => $product->net_price,
+                                'net_weight' => $product->net_weight,
                             ];
                         })];
                 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Glaze extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'percentage'];
 
     /**
      * Get the attributes that should be cast.
@@ -17,6 +17,7 @@ class Glaze extends Model
     {
         return [
             'name' => 'string',
+            'percentage' => 'integer',
         ];
     }
 

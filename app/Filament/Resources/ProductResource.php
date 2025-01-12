@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Classification;
+use App\Models\Glaze;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -75,7 +76,24 @@ class ProductResource extends Resource
                                 return auth()->user()->isEditor();
                             })
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('price_per_kg')) && $glaze) {
+                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
+                                    $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
+                                    $set('net_price', number_format($netPrice, 2, '.', ''));
+                                    $set('net_weight', $netWeight);
+                                }
+                            })->afterStateHydrated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('price_per_kg')) && $glaze) {
+                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
+                                    $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
+                                    $set('net_price', number_format($netPrice, 2, '.', ''));
+                                    $set('net_weight', $netWeight);
+                                }
+                            })->live(),
                         Forms\Components\Select::make('classification_id')
                             ->label('Clasificacion')
                             ->required()
@@ -94,26 +112,58 @@ class ProductResource extends Resource
                             ->label('Precio por kg')
                             ->required()
                             ->numeric()
-                            ->suffixIcon('heroicon-o-currency-euro'),
+                            ->suffixIcon('heroicon-o-currency-euro')
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('price_per_kg')) && $glaze) {
+                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
+                                    $set('net_price', number_format($netPrice, 2, '.', ''));
+                                }
+                            })->afterStateHydrated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('price_per_kg')) && $glaze) {
+                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
+                                    $set('net_price', number_format($netPrice, 2, '.', ''));
+                                }
+                            })
+                            ->live()
+                            ->debounce(),
                         Forms\Components\TextInput::make('net_price')
                             ->label('Precio neto')
                             ->numeric()
-                            ->suffixIcon('heroicon-o-currency-euro'),
+                            ->suffixIcon('heroicon-o-currency-euro')
+                            ->readOnly(),
                         Forms\Components\TextInput::make('weight_per_box')
                             ->label('Peso por caja')
                             ->required()
-                            ->maxLength(255)
+                            ->numeric()
                             ->suffixIcon('heroicon-o-scale')
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
-                            }),
+                            })
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('weight_per_box')) && $glaze) {
+                                    $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
+                                    $set('net_weight', $netWeight);
+                                }
+                            })->afterStateHydrated(function (Set $set, Get $get) {
+                                $glaze = Glaze::find($get('glaze_id'));
+                                if (filled($get('weight_per_box')) && $glaze) {
+                                    $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
+                                    $set('net_weight', $netWeight);
+                                }
+                            })
+                            ->live()
+                            ->debounce(),
                         Forms\Components\TextInput::make('net_weight')
                             ->label('Peso neto')
                             ->maxLength(255)
                             ->suffixIcon('heroicon-o-scale')
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
-                            }),
+                            })
+                            ->readOnly(),
                         Forms\Components\TextInput::make('code')
                             ->label('Codigo')
                             ->required()

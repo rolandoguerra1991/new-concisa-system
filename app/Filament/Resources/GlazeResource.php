@@ -3,19 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GlazeResource\Pages;
-use App\Models\Category;
 use App\Models\Glaze;
-use App\Models\SubCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class GlazeResource extends Resource
 {
@@ -36,7 +30,11 @@ class GlazeResource extends Resource
                     ->unique(
                         table: Glaze::class,
                         ignoreRecord: true,
-                    )
+                    ),
+                Forms\Components\TextInput::make('percentage')
+                    ->label('Porcentaje')
+                    ->required()
+                    ->integer(),
             ])->columns(1);
     }
 
@@ -48,6 +46,11 @@ class GlazeResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->label('Nombre'),
+
+                Tables\Columns\TextColumn::make('percentage')
+                    ->searchable()
+                    ->label('Porcentaje')
+                    ->suffix('%'),
             ])
             ->filters([
                 //

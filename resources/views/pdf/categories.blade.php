@@ -55,7 +55,13 @@
                         <tr>
                             <th>Clasificacion</th>
                             <th>Precio</th>
+                            @if ($tariff->include_net_columns)
+                                <th>Precio neto</th>
+                            @endif
                             <th>Peso</th>
+                            @if ($tariff->include_net_columns)
+                                <th>Peso neto</th>
+                            @endif
                             <th>Codigo</th>
                             <th>Cajas</th>
                             <th>Pal.</th>
@@ -66,7 +72,13 @@
                             <tr>
                                 <td style="background: #8E0000;color: #fff; font-weight: bold">{{ $product['classification'] }}</td>
                                 <td style="background: #02548C;color: #fff; font-weight: bold">{{ $product['price_per_kg'] }}€</td>
-                                <td style="background: #fff">{{ $product['weight_per_box'] }}</td>
+                                @if ($tariff->include_net_columns)
+                                    <td style="background: #02548C;color: #fff; font-weight: bold">{{ $product['net_price'] }}€</td>
+                                @endif
+                                <td style="background: #fff">{{ $product['weight_per_box'] }}kg</td>
+                                @if ($tariff->include_net_columns)
+                                    <td style="background: #fff">{{ $product['net_weight'] }}kg</td>
+                                @endif
                                 <td style="background: #fff">{{ $product['code'] }}</td>
                                 <td style="background: #fff">{{ $product['quantity_boxes'] }}</td>
                                 <td style="background: #fff">{{ $product['palette_dimensions'] }}</td>

@@ -34,6 +34,13 @@ class TariffResource extends Resource
                     ->required()
                     ->numeric()
                     ->suffixIcon('heroicon-o-percent-badge'),
+                Forms\Components\Radio::make('include_net_columns')
+                    ->label('Incluir columnas de neto')
+                    ->options([
+                        true => 'Sí',
+                        false => 'No',
+                    ])
+                    ->default(false),
             ])->columns(1);
     }
 
