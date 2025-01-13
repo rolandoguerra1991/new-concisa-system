@@ -3,7 +3,7 @@
 <head>
     <style>
         @page {
-            font-size: 12px;
+            font-size: 9.6px;
             font-family: Arial, sans-serif;
             margin: 0;
         }

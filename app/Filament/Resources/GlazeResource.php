@@ -51,7 +51,7 @@ class GlazeResource extends Resource
                     ->searchable()
                     ->label('Porcentaje')
                     ->suffix('%'),
-            ])
+            ])->defaultSort('percentage')
             ->filters([
                 //
             ])

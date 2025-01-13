@@ -20,7 +20,7 @@ class GenerateResportController extends Controller
                 'glaze',
                 'classification',
             ],
-        ])->get();
+        ])->has('subCategories.products')->get();
 
         $data = [];
 

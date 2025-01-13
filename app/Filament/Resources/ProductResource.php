@@ -83,7 +83,7 @@ class ProductResource extends Resource
                                     $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
                                     $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
                                     $set('net_price', number_format($netPrice, 2, '.', ''));
-                                    $set('net_weight', $netWeight);
+                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
                                 }
                             })->afterStateHydrated(function (Set $set, Get $get) {
                                 $glaze = Glaze::find($get('glaze_id'));
@@ -91,7 +91,7 @@ class ProductResource extends Resource
                                     $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
                                     $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
                                     $set('net_price', number_format($netPrice, 2, '.', ''));
-                                    $set('net_weight', $netWeight);
+                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
                                 }
                             })->live(),
                         Forms\Components\Select::make('classification_id')
@@ -145,13 +145,13 @@ class ProductResource extends Resource
                                 $glaze = Glaze::find($get('glaze_id'));
                                 if (filled($get('weight_per_box')) && $glaze) {
                                     $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
-                                    $set('net_weight', $netWeight);
+                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
                                 }
                             })->afterStateHydrated(function (Set $set, Get $get) {
                                 $glaze = Glaze::find($get('glaze_id'));
                                 if (filled($get('weight_per_box')) && $glaze) {
                                     $netWeight = $get('weight_per_box') / (1 - $glaze->percentage / 100);
-                                    $set('net_weight', $netWeight);
+                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
                                 }
                             })
                             ->live()
