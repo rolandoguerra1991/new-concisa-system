@@ -7,6 +7,7 @@ use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use setasign\Fpdi\Fpdi;
+use Str;
 
 class GenerateResportController extends Controller
 {
@@ -31,8 +32,9 @@ class GenerateResportController extends Controller
             ];
 
             foreach ($category->subCategories as $subCategory) {
+                $subCategoryString = $subCategory->fao ? "{$subCategory->name} - {$subCategory->fao}" : $subCategory->name;
                 $subCategoryData = [
-                    'sub_category_name' => $subCategory->name,
+                    'sub_category_name' => $subCategoryString,
                     'products_by_glaze' => [],
                 ];
 
@@ -74,23 +76,32 @@ class GenerateResportController extends Controller
             $data[] = $categoryData;
         }
 
-        $pdf1 = Pdf::loadView('pdf.cover', ['name' => $tariff->name]);
+        Pdf::loadView('pdf.cover', ['name' => $tariff->name])
+            ->save('cover.pdf', 'local');
 
-        $pdf1->save('cover.pdf', 'local');
+        foreach ($data as $category) {
+            $category_slug = Str::slug($category['category_name']);
+            Pdf::loadView('pdf.category', [
+                'category' => $category,
+                'tariff' => $tariff,
+            ])->save("{$category_slug}.pdf", 'local');
+        }
 
-        $pdf2 = Pdf::loadView('pdf.categories', compact('tariff', 'data'));
-        $pdf2->save('categories.pdf', 'local');
-
-        $pdf3 = Pdf::loadView('pdf.final');
-        $pdf3->save('final.pdf', 'local');
+        Pdf::loadView('pdf.final')
+            ->save('final.pdf', 'local');
 
         $pdf = new Fpdi;
 
         $files = [
             storage_path('app/private/cover.pdf'),
-            storage_path('app/private/categories.pdf'),
-            storage_path('app/private/final.pdf'),
         ];
+
+        foreach ($data as $category) {
+            $category_slug = Str::slug($category['category_name']);
+            $files[] = storage_path("app/private/{$category_slug}.pdf");
+        }
+
+        $files[] = storage_path('app/private/final.pdf');
 
         foreach ($files as $file) {
             $pageCount = $pdf->setSourceFile($file);
@@ -101,10 +112,11 @@ class GenerateResportController extends Controller
             }
         }
 
-        $combinedPdf = storage_path("app/private/{$tariff->name}.pdf");
+        $date = now()->format('d-m-Y');
+        $combinedPdf = storage_path("app/private/{$tariff->name}{$date}.pdf");
         $pdf->Output($combinedPdf, 'F');
 
-        return response()->download($combinedPdf, "{$tariff->name}.pdf");
+        return response()->download($combinedPdf, "{$tariff->name}{$date}.pdf");
     }
 
     public function roundToFiveOrZero($number)

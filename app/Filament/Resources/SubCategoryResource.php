@@ -42,6 +42,12 @@ class SubCategoryResource extends Resource
                     ->disabled(function (Get $get) {
                         return ! filled($get('category_id'));
                     }),
+                Forms\Components\TextInput::make('fao')
+                    ->label('Origen FAO')
+                    ->maxLength(255)
+                    ->disabled(function (Get $get) {
+                        return ! filled($get('category_id'));
+                    }),
             ])->columns(1);
     }
 
@@ -52,6 +58,9 @@ class SubCategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('fao')
+                    ->label('Zona FAO')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Categoria principal')
