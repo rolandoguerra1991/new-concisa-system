@@ -28,6 +28,7 @@ class GenerateResportController extends Controller
         foreach ($categories as $category) {
             $categoryData = [
                 'category_name' => $category->name,
+                'sort' => $this->getSort($category->name),
                 'sub_categories' => [],
             ];
 
@@ -76,16 +77,23 @@ class GenerateResportController extends Controller
             $data[] = $categoryData;
         }
 
+        $data = collect($data)->sortBy('sort')->values()->all();
+
         Pdf::loadView('pdf.cover', ['name' => $tariff->name])
             ->save('cover.pdf', 'local');
 
-        foreach ($data as $category) {
-            $category_slug = Str::slug($category['category_name']);
-            Pdf::loadView('pdf.category', [
-                'category' => $category,
-                'tariff' => $tariff,
-            ])->save("{$category_slug}.pdf", 'local');
-        }
+        // foreach ($data as $category) {
+        //     $category_slug = Str::slug($category['category_name']);
+        //     Pdf::loadView('pdf.category', [
+        //         'category' => $category,
+        //         'tariff' => $tariff,
+        //     ])->save("{$category_slug}.pdf", 'local');
+        // }
+
+        Pdf::loadView('pdf.category', [
+            'data' => $data,
+            'tariff' => $tariff,
+        ])->save('category.pdf', 'local');
 
         Pdf::loadView('pdf.final')
             ->save('final.pdf', 'local');
@@ -94,14 +102,16 @@ class GenerateResportController extends Controller
 
         $files = [
             storage_path('app/private/cover.pdf'),
+            storage_path('app/private/category.pdf'),
+            storage_path('app/private/final.pdf'),
         ];
 
-        foreach ($data as $category) {
-            $category_slug = Str::slug($category['category_name']);
-            $files[] = storage_path("app/private/{$category_slug}.pdf");
-        }
+        // foreach ($data as $category) {
+        //     $category_slug = Str::slug($category['category_name']);
+        //     $files[] = storage_path("app/private/{$category_slug}.pdf");
+        // }
 
-        $files[] = storage_path('app/private/final.pdf');
+        // $files[] = storage_path('app/private/final.pdf');
 
         foreach ($files as $file) {
             $pageCount = $pdf->setSourceFile($file);
@@ -116,7 +126,7 @@ class GenerateResportController extends Controller
         $combinedPdf = storage_path("app/private/{$tariff->name}{$date}.pdf");
         $pdf->Output($combinedPdf, 'F');
 
-        return response()->download($combinedPdf, "{$tariff->name}{$date}.pdf");
+        return response()->download($combinedPdf, "{$tariff->name}-{$date}.pdf");
     }
 
     public function roundToFiveOrZero($number)
@@ -139,5 +149,65 @@ class GenerateResportController extends Controller
         $final = $integerPart + $decimalPart;
 
         return number_format($final, 2, '.', '');
+    }
+
+    public function getSort($category_name)
+    {
+        $sort = 0;
+        switch ($category_name) {
+            case 'CHOCOS':
+                $sort = 1;
+                break;
+            case 'PULPOS':
+                $sort = 2;
+                break;
+            case 'CALAMAR':
+                $sort = 3;
+                break;
+            case 'REJO':
+                $sort = 4;
+                break;
+            case 'RODAJA DE POTÓN':
+                $sort = 5;
+                break;
+            case 'TIRAS DE POTÓN':
+                $sort = 6;
+                break;
+            case 'DADOS DE POTON CRUDOS':
+                $sort = 7;
+                break;
+            case 'TUBO INTERFOLIADO DE GIGAS':
+                $sort = 8;
+                break;
+            case 'TUBO DE GIGAS':
+                $sort = 9;
+                break;
+            case 'FILETE DE HALIBUT DE ALASKA':
+                $sort = 10;
+                break;
+            case 'FILETE DE TILAPIA SIN PIEL':
+                $sort = 11;
+                break;
+            case 'GALLINETA':
+                $sort = 12;
+                break;
+            case 'GAMBA PELADA EXTRA':
+                $sort = 13;
+                break;
+            case 'ALMEJA':
+                $sort = 14;
+                break;
+            case 'ANILLAS DE GIGAS':
+                $sort = 15;
+                break;
+            case 'BACALAO':
+                $sort = 16;
+                break;
+            case 'SALMON':
+                $sort = 17;
+                break;
+        }
+
+        return $sort;
     }
 }
