@@ -28,7 +28,6 @@ class GenerateResportController extends Controller
         foreach ($categories as $category) {
             $categoryData = [
                 'category_name' => $category->name,
-                'sort' => $this->getSort($category->name),
                 'sub_categories' => [],
             ];
 
@@ -45,8 +44,9 @@ class GenerateResportController extends Controller
                     $glaze = $products->first()->glaze;
                     $subCategoryData['products_by_glaze'][] = [
                         'glaze_name' => $glaze ? $glaze->name : 'Sin glaseo',
-                        'products' => $products->map(function ($product) use ($tariff) {
+                        'products' => $products->map(function ($product) use ($tariff, $glaze) {
                             $price_per_kg = $product->price_per_kg;
+                            $net_price = $product->net_price;
 
                             if ($tariff->increase_amount > 0) {
                                 $price_per_kg += $tariff->increase_amount;
@@ -54,6 +54,10 @@ class GenerateResportController extends Controller
 
                             if ($tariff->increase_percentage > 0) {
                                 $price_per_kg += $price_per_kg * $tariff->increase_percentage / 100;
+                            }
+
+                            if ($tariff->include_net_columns) {
+                                $net_price = $this->getNetPrice(floatval($price_per_kg), $glaze->percentage);
                             }
 
                             $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
@@ -65,7 +69,7 @@ class GenerateResportController extends Controller
                                 'code' => $product->code,
                                 'quantity_boxes' => $product->quantity_boxes,
                                 'palette_dimensions' => $product->palette_dimensions,
-                                'net_price' => $product->net_price,
+                                'net_price' => $net_price,
                                 'net_weight' => $product->net_weight,
                             ];
                         })];
@@ -76,8 +80,6 @@ class GenerateResportController extends Controller
 
             $data[] = $categoryData;
         }
-
-        $data = collect($data)->sortBy('sort')->values()->all();
 
         Pdf::loadView('pdf.cover', ['name' => $tariff->name])
             ->save('cover.pdf', 'local');
@@ -151,63 +153,10 @@ class GenerateResportController extends Controller
         return number_format($final, 2, '.', '');
     }
 
-    public function getSort($category_name)
+    public function getNetPrice($price_per_kg, $percentage)
     {
-        $sort = 0;
-        switch ($category_name) {
-            case 'CHOCOS':
-                $sort = 1;
-                break;
-            case 'PULPOS':
-                $sort = 2;
-                break;
-            case 'CALAMAR':
-                $sort = 3;
-                break;
-            case 'REJO':
-                $sort = 4;
-                break;
-            case 'RODAJA DE POTÓN':
-                $sort = 5;
-                break;
-            case 'TIRAS DE POTÓN':
-                $sort = 6;
-                break;
-            case 'DADOS DE POTON CRUDOS':
-                $sort = 7;
-                break;
-            case 'TUBO INTERFOLIADO DE GIGAS':
-                $sort = 8;
-                break;
-            case 'TUBO DE GIGAS':
-                $sort = 9;
-                break;
-            case 'FILETE DE HALIBUT DE ALASKA':
-                $sort = 10;
-                break;
-            case 'FILETE DE TILAPIA SIN PIEL':
-                $sort = 11;
-                break;
-            case 'GALLINETA':
-                $sort = 12;
-                break;
-            case 'GAMBA PELADA EXTRA':
-                $sort = 13;
-                break;
-            case 'ALMEJA':
-                $sort = 14;
-                break;
-            case 'ANILLAS DE GIGAS':
-                $sort = 15;
-                break;
-            case 'BACALAO':
-                $sort = 16;
-                break;
-            case 'SALMON':
-                $sort = 17;
-                break;
-        }
+        $netPrice = $price_per_kg / (1 - $percentage / 100);
 
-        return $sort;
+        return $this->roundToFiveOrZero($netPrice);
     }
 }
