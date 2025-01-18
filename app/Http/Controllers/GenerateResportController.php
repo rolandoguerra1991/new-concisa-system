@@ -47,6 +47,7 @@ class GenerateResportController extends Controller
                         'products' => $products->map(function ($product) use ($tariff, $glaze) {
                             $price_per_kg = $product->price_per_kg;
                             $net_price = $product->net_price;
+                            $net_weight = $product->net_weight;
 
                             if ($tariff->increase_amount > 0) {
                                 $price_per_kg += $tariff->increase_amount;
@@ -58,6 +59,7 @@ class GenerateResportController extends Controller
 
                             if ($tariff->include_net_columns) {
                                 $net_price = $this->getNetPrice(floatval($price_per_kg), $glaze->percentage);
+                                $net_weight = $this->getNetWeight(floatval($product->weight_per_box), $glaze->percentage);
                             }
 
                             $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
@@ -70,7 +72,7 @@ class GenerateResportController extends Controller
                                 'quantity_boxes' => $product->quantity_boxes,
                                 'palette_dimensions' => $product->palette_dimensions,
                                 'net_price' => $net_price,
-                                'net_weight' => $product->net_weight,
+                                'net_weight' => $net_weight,
                             ];
                         })];
                 }
@@ -158,5 +160,12 @@ class GenerateResportController extends Controller
         $netPrice = $price_per_kg / (1 - $percentage / 100);
 
         return $this->roundToFiveOrZero($netPrice);
+    }
+
+    public function getNetWeight($weight_per_box, $percentage)
+    {
+        $netWeight = $weight_per_box - $percentage * $weight_per_box / 100;
+
+        return $this->roundToFiveOrZero($netWeight);
     }
 }
