@@ -1,7 +1,3 @@
-@php
-$bg = public_path('img/PORTADA.jpg');
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
     <header>
@@ -14,7 +10,7 @@ $bg = public_path('img/PORTADA.jpg');
                 width: 100%;
                 height: 100%;
                 text-align: center;
-                background: url("{{ $bg }}");
+                background: url("{{ $background }}");
                 background-size: cover;
             }
         </style>

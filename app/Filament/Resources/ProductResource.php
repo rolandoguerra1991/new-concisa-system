@@ -12,6 +12,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -207,7 +208,14 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('palette_dimensions')->label('Dimensiones de la paleta'),
             ])
             ->filters([
-                //
+                Filters\SelectFilter::make('category_id')
+                    ->label('Categoria principal')
+                    ->relationship('category', 'name'),
+                Filters\SelectFilter::make('sub_category_id')
+                    ->label('Sub categoria')
+                    ->relationship('subCategory', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

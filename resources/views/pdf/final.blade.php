@@ -1,7 +1,3 @@
-@php
-$bg = public_path('img/PAG_FINAL.jpg');
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
     <header>
@@ -15,7 +11,7 @@ $bg = public_path('img/PAG_FINAL.jpg');
                 height: 100%;
                 margin: 0 auto;
                 text-align: center;
-                background: url("{{ $bg }}");
+                background: url("{{ $background }}");
                 background-size: cover;
             }
         </style>
