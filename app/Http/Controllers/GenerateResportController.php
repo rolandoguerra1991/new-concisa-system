@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DB;
@@ -82,41 +83,99 @@ class GenerateResportController extends Controller
 
         $products->map(function ($product) use ($subCategoryOrder) {
             $product->sub_category_order = $subCategoryOrder[$product->sub_category];
-
+            $product->sub_category = "{$product->sub_category} - ({$product->fao})";
             return $product;
         });
 
         $products = $products->sortBy('sub_category_order');
-        $products = $products->groupBy('sub_category')->map(function ($item) use ($tariff) {
-            return $item->groupBy('glaze')->map(function ($item) use ($tariff) {
-                return $item->map(function ($item) use ($tariff) {
-                    return $this->mapProduct($tariff, $item);
-                });
-            });
-        });
+
+        $categoriesWithProducts = Category::has('products')
+            ->get()
+            ->pluck('name')
+            ->toArray();
+
+        if(in_array('CHOCOS', $categoriesWithProducts)) {
+            [$page1, $page2] = $products->where('category', 'CHOCOS')
+                ->split(2)
+                ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('PULPOS', $categoriesWithProducts)) {
+            [$page3, $page4, $page5, $page6, $page7] = $products->where('category', 'PULPOS')
+                ->split(5)
+                ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('CALAMAR', $categoriesWithProducts)) {
+            [$page8] = $products->where('category', 'CALAMAR')
+            ->split(1)
+            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('REJO', $categoriesWithProducts)) {
+            [$page9] = $products->where('category', 'REJO')
+            ->split(1)
+            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('RODAJA DE POTÓN', $categoriesWithProducts)) {
+            [$page10] = $products->where('category', 'RODAJA DE POTÓN')
+            ->split(1)
+            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('TIRAS DE POTÓN', $categoriesWithProducts) || in_array('DADOS DE POTON CRUDOS', $categoriesWithProducts)) {
+            [$page11] = $products->whereIn('category', ['TIRAS DE POTÓN', 'DADOS DE POTON CRUDOS'])
+            ->split(1)
+            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        if(in_array('IMPORTACIÓN', $categoriesWithProducts)) {
+            [$page12, $page13, $page14] = $products->where('category', 'IMPORTACIÓN')
+            ->split(3)
+            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
+        }
+
+        $pages = collect();
+
+        for ($i = 1; $i <= 14; $i++) {
+            $variableName = "page{$i}";
+            if (isset($$variableName)) {
+                $pages->push([
+                    'page' => $i,
+                    'data' => $$variableName,
+                    'background' => public_path("img/PAGINAS-{$i}.jpg"),
+                ]);
+            }
+        }
 
         $pdf = new Fpdi;
 
-        $files = [
-            storage_path('app/private/cover.pdf'),
-            storage_path('app/private/page.pdf'),
-            storage_path('app/private/final.pdf'),
-        ];
+        $files = [];
+
+        $files[] = storage_path('app/private/cover.pdf');
 
         Pdf::loadView('pdf.cover', [
             'name' => $tariff->name,
-            'background' => public_path('img/PAGINAS-1.jpg'),
+            'background' => public_path('img/cover.jpg'),
         ])->save('cover.pdf', 'local');
 
-        Pdf::loadView('pdf.page', [
-            'background' => public_path('img/FONDO_GENERICO.jpg'),
-            'tariff' => $tariff,
-            'data' => $products,
-        ])->save('page.pdf', 'local');
+
+        for ($i = 1; $i <= 14; $i++) {
+            $page = $pages->where('page', $i)->first();
+            Pdf::loadView('pdf.page', [
+                'background' => $page['background'],
+                'tariff' => $tariff,
+                'data' => $page['data'],
+            ])->save("page-{$i}.pdf", 'local');
+            $files[] = storage_path("app/private/page-{$i}.pdf");
+        }
 
         Pdf::loadView('pdf.final', [
-            'background' => public_path('img/PAGINAS-16.jpg'),
+            'background' => public_path('img/final.jpg'),
         ])->save('final.pdf', 'local');
+
+        $files[] = storage_path('app/private/final.pdf');
 
         foreach ($files as $file) {
             $pageCount = $pdf->setSourceFile($file);
@@ -183,7 +242,6 @@ class GenerateResportController extends Controller
         }
 
         $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
-
         return [
             'classification' => $product->classification ?? 'Sin clasificación',
             'price_per_kg' => $price_per_kg,
@@ -201,5 +259,16 @@ class GenerateResportController extends Controller
         $netWeight = $weight_per_box - $percentage * $weight_per_box / 100;
 
         return $this->roundToFiveOrZero($netWeight);
+    }
+
+    public function groupProducts($items, $tariff)
+    {
+        return $items->groupBy('sub_category')->map(function ($item) use ($tariff) {
+            return $item->groupBy('glaze')->map(function ($item) use ($tariff) {
+                return $item->map(function ($item) use ($tariff) {
+                    return $this->mapProduct($tariff, $item);
+                });
+            });
+        });
     }
 }
