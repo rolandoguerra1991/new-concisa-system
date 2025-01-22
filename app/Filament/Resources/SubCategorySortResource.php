@@ -50,8 +50,11 @@ class SubCategorySortResource extends Resource
                     ->label('Orden')
                     ->helperText('El orden en el que se mostrará la sub categoria en el reporte.')
                     ->default(function() {
-                        $lastSort = SubCategorySort::orderBy('id','desc')->first()->sort;
-                        return $lastSort + 1;
+                        $lastSort = SubCategorySort::orderBy('id','desc')->first();
+                        if (!$lastSort) {
+                            return 1;
+                        }
+                        return $lastSort->sort + 1;
                     }),
             ])->columns(1);
     }
