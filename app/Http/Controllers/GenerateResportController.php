@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\SubCategorySort;
 use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DB;
@@ -39,50 +40,10 @@ class GenerateResportController extends Controller
             ])
             ->get();
 
-        $subCategoryOrder = [
-            'CHOCO LIMPIO' => 1,
-            'HUEVA DE CHOCO A GRANEL' => 2,
-            'HUEVA DE CHOCO EN BANDEJA' => 3,
-            'PULPO EN BANDEJA PREMIUM' => 4,
-            'PULPO EN BANDEJA' => 5,
-            'PULPO EN BANDEJA BLUE' => 6,
-            'PULPO BATIDO EN FLOR' => 7,
-            'PULPO BATIDO EN FLOR BLUE OCTOPUS' => 8,
-            'TENTACULO DE PULPO COCIDO (PESO FIJO)' => 9,
-            'TENTACULO DE PULPO COCIDO (PESO VARIABLE)' => 10,
-            'TENTACULO DE PULPO COCIDO A GRANEL' => 11,
-            'PULPO ENTERO COCIDO AL VACIO' => 12,
-            'PULPO ENTERO COCIDO HIGIENIZADO' => 13,
-            'RODAJA DE PULPO COCIDO CON CABEZA (A GRANEL)' => 14,
-            'RODAJA DE PULPO COCIDO SIN CABEZA (A GRANEL)' => 15,
-            'CALAMAR IQF' => 16,
-            'CALAMAR AL VACIO' => 17,
-            'PATA DE REJO COCIDA' => 18,
-            'REJO ENTERO COCIDO' => 19,
-            'PATA DE REJO CRUDA BANDEJA' => 20,
-            'PATA DE REJO CRUDA GRANEL' => 21,
-            'RODAJA DE P. COCIDO PREMIUM' => 22,
-            'RODAJA DE P. COCIDO STANDARD' => 23,
-            'RODAJA DE POTÓN COCIDO BLUE OCTOPUS' => 24,
-            'RODAJA DE P. COCIDO Y PATATA' => 25,
-            'TIRAS DE POTON' => 26,
-            'DADOS DE POTON CRUDOS' => 27,
-            'CHOCO LIMPIO INDIO' => 28,
-            'CALAMAR INDIO' => 29,
-            'TUBO INTERFOLIADO DE GIGAS' => 30,
-            'TUBO DE GIGAS' => 31,
-            'FILETE DE HALIBUT DE ALASKA' => 32,
-            'FILETE DE TILAPIA SIN PIEL' => 33,
-            'GALLINETA' => 34,
-            'GAMBA PELADA EXTRA' => 35,
-            'ALMEJA' => 36,
-            'ANILLAS DE GIGAS' => 37,
-            'BACALAO' => 38,
-            'SALMON' => 39,
-        ];
+        $subCategoryOrder = SubCategorySort::all();
 
         $products->map(function ($product) use ($subCategoryOrder) {
-            $product->sub_category_order = $subCategoryOrder[$product->sub_category];
+            $product->sub_category_order = $subCategoryOrder->where('sub_category_id', $product->sub_category)->first()->sort;
             $product->sub_category = "{$product->sub_category} - ({$product->fao})";
             return $product;
         });

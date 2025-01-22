@@ -31,4 +31,9 @@ class SubCategory extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function subCategorySorts()
+    {
+        return $this->hasMany(SubCategorySort::class);
+    }
 }

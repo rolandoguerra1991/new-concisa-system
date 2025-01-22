@@ -38,6 +38,7 @@ class AppPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                Pages\ReportBuilder::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -60,7 +61,6 @@ class AppPanelProvider extends PanelProvider
             ])
             ->profile()
             ->maxContentWidth(MaxWidth::Full)
-            ->viteTheme('resources/css/filament/app/theme.css')
-            ->darkMode(false);
+            ->viteTheme('resources/css/filament/app/theme.css');
     }
 }

@@ -58,7 +58,6 @@ class ProductResource extends Resource
                                 }
                             )
                             ->afterStateUpdated(function (Set $set) {
-                                $set('glaze_id', null);
                                 $set('classification_id', null);
                             })
                             ->live()
@@ -86,15 +85,9 @@ class ProductResource extends Resource
                                     $set('net_price', number_format($netPrice, 2, '.', ''));
                                     $set('net_weight', number_format($netWeight, 2, '.', ''));
                                 }
-                            })->afterStateHydrated(function (Set $set, Get $get) {
-                                $glaze = Glaze::find($get('glaze_id'));
-                                if (filled($get('price_per_kg')) && $glaze) {
-                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
-                                    $netWeight = $get('weight_per_box') - $glaze->percentage * $get('weight_per_box') / 100;
-                                    $set('net_price', number_format($netPrice, 2, '.', ''));
-                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
-                                }
-                            })->live(),
+                            })
+                            ->required()
+                            ->live(),
                         Forms\Components\Select::make('classification_id')
                             ->label('Clasificacion')
                             ->required()
@@ -120,12 +113,6 @@ class ProductResource extends Resource
                                     $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
                                     $set('net_price', number_format($netPrice, 2, '.', ''));
                                 }
-                            })->afterStateHydrated(function (Set $set, Get $get) {
-                                $glaze = Glaze::find($get('glaze_id'));
-                                if (filled($get('price_per_kg')) && $glaze) {
-                                    $netPrice = $get('price_per_kg') / (1 - $glaze->percentage / 100);
-                                    $set('net_price', number_format($netPrice, 2, '.', ''));
-                                }
                             })
                             ->live()
                             ->debounce(),
@@ -133,7 +120,8 @@ class ProductResource extends Resource
                             ->label('Precio neto')
                             ->numeric()
                             ->suffixIcon('heroicon-o-currency-euro')
-                            ->readOnly(),
+                            ->readOnly()
+                            ->required(),
                         Forms\Components\TextInput::make('weight_per_box')
                             ->label('Peso por caja')
                             ->required()
@@ -143,12 +131,6 @@ class ProductResource extends Resource
                                 return auth()->user()->isEditor();
                             })
                             ->afterStateUpdated(function (Set $set, Get $get) {
-                                $glaze = Glaze::find($get('glaze_id'));
-                                if (filled($get('weight_per_box')) && $glaze) {
-                                    $netWeight = $get('weight_per_box') - $glaze->percentage * $get('weight_per_box') / 100;
-                                    $set('net_weight', number_format($netWeight, 2, '.', ''));
-                                }
-                            })->afterStateHydrated(function (Set $set, Get $get) {
                                 $glaze = Glaze::find($get('glaze_id'));
                                 if (filled($get('weight_per_box')) && $glaze) {
                                     $netWeight = $get('weight_per_box') - $glaze->percentage * $get('weight_per_box') / 100;
@@ -164,7 +146,8 @@ class ProductResource extends Resource
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
                             })
-                            ->readOnly(),
+                            ->readOnly()
+                            ->required(),
                         Forms\Components\TextInput::make('code')
                             ->label('Codigo')
                             ->required()
@@ -197,25 +180,40 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->columns([
-                Tables\Columns\TextColumn::make('category.name')->label('Categoria principal')->searchable(),
-                Tables\Columns\TextColumn::make('subCategory.name')->label('Sub categoria')->searchable(),
-                Tables\Columns\TextColumn::make('glaze.name')->label('Glaseo')->searchable(),
                 Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion')->searchable(),
+                Tables\Columns\TextColumn::make('category.name')->label('Categoria principal')->searchable(),
+                Tables\Columns\TextColumn::make('subCategory.name')->label(label: 'Sub categoria')->searchable(),
+                Tables\Columns\TextColumn::make('glaze.name')->label('Glaseo')->searchable(),
                 Tables\Columns\TextColumn::make('price_per_kg')->label('Precio por kg')->searchable(),
+                Tables\Columns\TextColumn::make('net_price')->label('Precio neto')->searchable(),
                 Tables\Columns\TextColumn::make('code')->label('Codigo')->searchable(),
                 Tables\Columns\TextColumn::make('quantity_boxes')->label('Cantidad de cajas'),
                 Tables\Columns\TextColumn::make('weight_per_box')->label('Peso por caja'),
+                Tables\Columns\TextColumn::make('net_weight')->label('Peso neto'),
                 Tables\Columns\TextColumn::make('palette_dimensions')->label('Dimensiones de la paleta'),
             ])
             ->filters([
                 Filters\SelectFilter::make('category_id')
                     ->label('Categoria principal')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 Filters\SelectFilter::make('sub_category_id')
                     ->label('Sub categoria')
                     ->relationship('subCategory', 'name')
                     ->searchable()
                     ->preload(),
+                Filters\SelectFilter::make('glaze_id')
+                    ->label('Glaseo')
+                    ->relationship('glaze', 'name')
+                    ->searchable()
+                    ->preload(),
+                Filters\QueryBuilder::make()
+                    ->constraints([
+                        Filters\QueryBuilder\Constraints\NumberConstraint::make('net_price')
+                            ->label('Precio neto')
+                            ->nullable()
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
