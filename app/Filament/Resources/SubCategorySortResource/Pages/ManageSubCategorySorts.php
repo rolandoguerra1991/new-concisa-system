@@ -15,7 +15,7 @@ class ManageSubCategorySorts extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
-            ->modalWidth(MaxWidth::Medium),
+                ->modalWidth(MaxWidth::Medium),
         ];
     }
 }

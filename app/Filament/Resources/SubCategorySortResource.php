@@ -9,9 +9,11 @@ use App\Models\SubCategorySort;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubCategorySortResource extends Resource
@@ -32,11 +34,13 @@ class SubCategorySortResource extends Resource
                     ->relationship(
                         name: 'subCategory',
                         titleAttribute: 'name',
-                        modifyQueryUsing: function(Builder $query) {
-                            $usedSubCategoryIds = SubCategorySort::query()
-                                ->select('sub_category_id')
-                                ->pluck('sub_category_id');
-                            return $query->whereNotIn('id', $usedSubCategoryIds);
+                        modifyQueryUsing: function(Builder $query, ?Model $record) {
+                            if(!$record) {
+                                $usedSubCategoryIds = SubCategorySort::query()
+                                    ->select('sub_category_id')
+                                    ->pluck('sub_category_id');
+                                return $query->whereNotIn('id', $usedSubCategoryIds);
+                            }
                         }
                     )
                     ->searchable()
@@ -64,7 +68,8 @@ class SubCategorySortResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('subCategory.name')
-                    ->label('Sub categoria'),
+                    ->label('Sub categoria')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('sort')
                     ->label('Orden'),
             ])
@@ -72,7 +77,8 @@ class SubCategorySortResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->modalWidth(MaxWidth::Medium),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

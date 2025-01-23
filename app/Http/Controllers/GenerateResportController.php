@@ -26,6 +26,7 @@ class GenerateResportController extends Controller
             ->select([
                 'categories.name as category',
                 'sub_categories.name as sub_category',
+                'sub_categories.id as sub_category_id',
                 'sub_categories.fao as fao',
                 'glazes.name as glaze',
                 'glazes.percentage as glaze_percentage',
@@ -43,7 +44,8 @@ class GenerateResportController extends Controller
         $subCategoryOrder = SubCategorySort::all();
 
         $products->map(function ($product) use ($subCategoryOrder) {
-            $product->sub_category_order = $subCategoryOrder->where('sub_category_id', $product->sub_category)->first()->sort;
+            $order = $subCategoryOrder->where('sub_category_id', $product->sub_category_id)->first();
+            $product->sub_category_order = $order?->sort ?? 9999;
             $product->sub_category = "{$product->sub_category} - ({$product->fao})";
             return $product;
         });
