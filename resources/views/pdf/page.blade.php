@@ -81,11 +81,11 @@
                                 {{ $product['classification'] }}
                             </td>
                             <td style="background: #02548C;color: #fff; font-weight: bold; font-size: 9.6px">
-                                {{ $product['price_per_kg'] }} €
+                                {{ $product['price_per_kg'] }}
                             </td>
                             @if ($tariff->include_net_columns)
                                 <td style="background: #02548C;color: #fff; font-weight: bold; font-size: 9.6px">
-                                    {{ $product['net_price'] }} €
+                                    {{ $product['net_price'] }}
                                 </td>
                             @endif
                             <td style="background: #fff; font-size: 9.6px">{{ $product['weight_per_box'] }} kg</td>

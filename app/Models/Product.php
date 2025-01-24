@@ -18,6 +18,7 @@ class Product extends Model
         'sub_category_id',
         'net_price',
         'net_weight',
+        'is_available'
     ];
 
     protected function casts(): array
@@ -34,6 +35,7 @@ class Product extends Model
             'sub_category_id' => 'integer',
             'net_price' => 'decimal:2',
             'net_weight' => 'decimal:2',
+            'is_available' => 'boolean'
         ];
     }
 

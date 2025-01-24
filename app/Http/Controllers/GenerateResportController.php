@@ -38,6 +38,7 @@ class GenerateResportController extends Controller
                 'products.quantity_boxes',
                 'products.palette_dimensions',
                 'products.net_weight',
+                'products.is_available',
             ])
             ->get();
 
@@ -57,59 +58,29 @@ class GenerateResportController extends Controller
             ->pluck('name')
             ->toArray();
 
-        if(in_array('CHOCOS', $categoriesWithProducts)) {
-            [$page1, $page2] = $products->where('category', 'CHOCOS')
-                ->split(2)
-                ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
+        $pages = [];
 
-        if(in_array('PULPOS', $categoriesWithProducts)) {
-            [$page3, $page4, $page5, $page6, $page7] = $products->where('category', 'PULPOS')
-                ->split(5)
-                ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
+        foreach ($categoriesWithProducts as $category) {
+            $productsPerCategory = $products->where('category', $category);
+            $pagedProducts = collect();
+            $currentPage = 1;
+            $currentCount = 0;
 
-        if(in_array('CALAMAR', $categoriesWithProducts)) {
-            [$page8] = $products->where('category', 'CALAMAR')
-            ->split(1)
-            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
+            $productsPerCategory->each(function ($product) use (&$pagedProducts, &$currentPage, &$currentCount) {
+                $currentCount++;
+                if ($currentCount > 35) {
+                    $currentPage++;
+                    $currentCount = 1;
+                }
 
-        if(in_array('REJO', $categoriesWithProducts)) {
-            [$page9] = $products->where('category', 'REJO')
-            ->split(1)
-            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
+                $pagedProducts->push(['page' => $currentPage, 'product' => $product]);
+            });
 
-        if(in_array('RODAJA DE POTÓN', $categoriesWithProducts)) {
-            [$page10] = $products->where('category', 'RODAJA DE POTÓN')
-            ->split(1)
-            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
+            $groupedProducts = $pagedProducts->groupBy('page')->map(function ($pageGroup) use ($tariff) {
+                return $this->groupProducts($pageGroup->pluck('product'), $tariff);
+            });
 
-        if(in_array('TIRAS DE POTÓN', $categoriesWithProducts) || in_array('DADOS DE POTON CRUDOS', $categoriesWithProducts)) {
-            [$page11] = $products->whereIn('category', ['TIRAS DE POTÓN', 'DADOS DE POTON CRUDOS'])
-            ->split(1)
-            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
-
-        if(in_array('IMPORTACIÓN', $categoriesWithProducts)) {
-            [$page12, $page13, $page14] = $products->where('category', 'IMPORTACIÓN')
-            ->split(3)
-            ->map(fn($chunk) => $this->groupProducts($chunk, $tariff));
-        }
-
-        $pages = collect();
-
-        for ($i = 1; $i <= 14; $i++) {
-            $variableName = "page{$i}";
-            if (isset($$variableName)) {
-                $pages->push([
-                    'page' => $i,
-                    'data' => $$variableName,
-                    'background' => public_path("img/PAGINAS-{$i}.jpg"),
-                ]);
-            }
+            $pages = array_merge($pages, $groupedProducts->toArray());
         }
 
         $pdf = new Fpdi;
@@ -123,13 +94,11 @@ class GenerateResportController extends Controller
             'background' => public_path('img/cover.jpg'),
         ])->save('cover.pdf', 'local');
 
-
-        for ($i = 1; $i <= 14; $i++) {
-            $page = $pages->where('page', $i)->first();
+        for ($i=0; $i < count($pages); $i++) {
             Pdf::loadView('pdf.page', [
-                'background' => $page['background'],
+                'background' => '',
                 'tariff' => $tariff,
-                'data' => $page['data'],
+                'data' => $pages[$i],
             ])->save("page-{$i}.pdf", 'local');
             $files[] = storage_path("app/private/page-{$i}.pdf");
         }
@@ -207,12 +176,12 @@ class GenerateResportController extends Controller
         $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
         return [
             'classification' => $product->classification ?? 'Sin clasificación',
-            'price_per_kg' => $price_per_kg,
+            'price_per_kg' => $product->is_available ? "{$price_per_kg} €" : '-',
             'weight_per_box' => $product->weight_per_box,
             'code' => $product->code,
             'quantity_boxes' => $product->quantity_boxes,
             'palette_dimensions' => $product->palette_dimensions,
-            'net_price' => $net_price,
+            'net_price' => $product->is_available ? "{$net_price} €" : '-',
             'net_weight' => $net_weight,
         ];
     }

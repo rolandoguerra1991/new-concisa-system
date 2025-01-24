@@ -171,6 +171,11 @@ class ProductResource extends Resource
                             ->disabled(function () {
                                 return auth()->user()->isEditor();
                             }),
+                        Forms\Components\Toggle::make('is_available')
+                            ->label('Esta disponible este producto?')
+                            ->disabled(function () {
+                                return auth()->user()->isEditor();
+                            })->columnSpanFull(),
                     ]),
             ]);
     }
@@ -180,6 +185,7 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->columns([
+                Tables\Columns\ToggleColumn::make('is_available')->label('Disponible'),
                 Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion')->searchable(),
                 Tables\Columns\TextColumn::make('category.name')->label('Categoria principal')->searchable(),
                 Tables\Columns\TextColumn::make('subCategory.name')->label(label: 'Sub categoria')->searchable(),
@@ -221,6 +227,15 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('is_available')
+                        ->label('Marcar como disponible')
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-check-circle')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['is_available' => true]);
+                            }
+                        }),
                 ]),
             ]);
     }
