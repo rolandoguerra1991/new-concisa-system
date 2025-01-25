@@ -51,16 +51,15 @@ class GenerateResportController extends Controller
             return $product;
         });
 
+
         $products = $products->sortBy('sub_category_order');
 
-        $categoriesWithProducts = Category::has('products')
-            ->get()
-            ->pluck('name')
-            ->toArray();
+
+        $categories = $products->groupBy('category')->keys()->toArray();
 
         $pages = [];
 
-        foreach ($categoriesWithProducts as $category) {
+        foreach ($categories as $category) {
             $productsPerCategory = $products->where('category', $category);
             $pagedProducts = collect();
             $currentPage = 1;

@@ -41,21 +41,23 @@
         h4.glaze-title {
             background: #f2f2f2;
             padding: 4px;
-            margin-top: 5px;
+            margin-top: 0px;
+            margin-bottom: 0px;
             width: auto;
             display: inline-block;
             font-size: 9.6px;
         }
 
         table {
-            margin-bottom: 5px;
+            margin-top: 0px;
+            margin-bottom: 25px;
         }
     </style>
 
 <body>
     <div style="width: 500px;">
         @foreach ($data as $key => $value)
-            <h3 style="font-size: 14px;">{{  $key }}</h3>
+            <h3 style="font-size: 14px; margin-bottom: 0px">{{  $key }}</h3>
             @foreach ($value as $keyProduct => $products)
                 <h4 class="glaze-title">Glaseo: {{ $keyProduct }}</h4>
                 <table>
