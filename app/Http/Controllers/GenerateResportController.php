@@ -90,20 +90,22 @@ class GenerateResportController extends Controller
 
         Pdf::loadView('pdf.cover', [
             'name' => $tariff->name,
-            'background' => public_path('img/cover.jpg'),
+            'background' => public_path('img/PAGINAS-1.jpg'),
         ])->save('cover.pdf', 'local');
 
+        $currentProductsPage = 2;
         for ($i=0; $i < count($pages); $i++) {
             Pdf::loadView('pdf.page', [
-                'background' => '',
+                'background' => public_path("img/PAGINAS-{$currentProductsPage}.jpg"),
                 'tariff' => $tariff,
                 'data' => $pages[$i],
             ])->save("page-{$i}.pdf", 'local');
             $files[] = storage_path("app/private/page-{$i}.pdf");
+            $currentProductsPage++;
         }
 
         Pdf::loadView('pdf.final', [
-            'background' => public_path('img/final.jpg'),
+            'background' => public_path('img/PAGINAS-17.jpg'),
         ])->save('final.pdf', 'local');
 
         $files[] = storage_path('app/private/final.pdf');
