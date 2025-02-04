@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\PageBackground;
 use App\Models\SubCategorySort;
 use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -88,15 +89,17 @@ class GenerateResportController extends Controller
 
         $files[] = storage_path('app/private/cover.pdf');
 
+        $pagesBackground = PageBackground::all();
         Pdf::loadView('pdf.cover', [
             'name' => $tariff->name,
-            'background' => public_path('img/PAGINAS-1.jpg'),
+            'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_1')->first()->background_image}"),
         ])->save('cover.pdf', 'local');
 
         $currentProductsPage = 2;
         for ($i=0; $i < count($pages); $i++) {
+            $pageBackground = $pagesBackground->where('page', "page_{$currentProductsPage}")->first();
             Pdf::loadView('pdf.page', [
-                'background' => public_path("img/PAGINAS-{$currentProductsPage}.jpg"),
+                'background' => storage_path("app/public/{$pageBackground->background_image}"),
                 'tariff' => $tariff,
                 'data' => $pages[$i],
             ])->save("page-{$i}.pdf", 'local');
@@ -105,7 +108,7 @@ class GenerateResportController extends Controller
         }
 
         Pdf::loadView('pdf.final', [
-            'background' => public_path('img/PAGINAS-17.jpg'),
+            'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_17')->first()->background_image}"),
         ])->save('final.pdf', 'local');
 
         $files[] = storage_path('app/private/final.pdf');

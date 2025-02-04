@@ -24,7 +24,7 @@
                 Configura las imagenes de fondo que se mostraran en los reportes.
             </x-slot>
             <x-filament::link
-                href="#"
+                :href="route('filament.app.resources.page-backgrounds.index')"
                 icon="heroicon-m-arrow-long-right"
                 icon-position="after">
                 Ir a la configuracion
