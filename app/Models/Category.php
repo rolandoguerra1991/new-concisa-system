@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'name_en', 'name_pt', 'name_it'];
 
     /**
      * Get the attributes that should be cast.
@@ -17,6 +17,9 @@ class Category extends Model
     {
         return [
             'name' => 'string',
+            'name_en' => 'string',
+            'name_pt' => 'string',
+            'name_it' => 'string',
         ];
     }
 

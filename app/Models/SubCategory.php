@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubCategory extends Model
 {
-    protected $fillable = ['name', 'category_id', 'fao'];
+    protected $fillable = ['name', 'category_id', 'fao', 'name_en', 'name_pt', 'name_it'];
 
     public function casts(): array
     {
@@ -14,6 +14,9 @@ class SubCategory extends Model
             'name' => 'string',
             'category_id' => 'integer',
             'fao' => 'string',
+            'name_en' => 'string',
+            'name_pt' => 'string',
+            'name_it' => 'string',
         ];
     }
 

@@ -9,6 +9,7 @@ use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use setasign\Fpdi\Fpdi;
 
 class GenerateResportController extends Controller
@@ -26,12 +27,24 @@ class GenerateResportController extends Controller
             ->join('classifications', 'products.classification_id', '=', 'classifications.id')
             ->select([
                 'categories.name as category',
+                'categories.name_en as category_en',
+                'categories.name_pt as category_pt',
+                'categories.name_it as category_it',
                 'sub_categories.name as sub_category',
+                'sub_categories.name_en as sub_category_en',
+                'sub_categories.name_pt as sub_category_pt',
+                'sub_categories.name_it as sub_category_it',
                 'sub_categories.id as sub_category_id',
                 'sub_categories.fao as fao',
                 'glazes.name as glaze',
+                'glazes.name_en as glaze_en',
+                'glazes.name_pt as glaze_pt',
+                'glazes.name_it as glaze_it',
                 'glazes.percentage as glaze_percentage',
                 'classifications.name as classification',
+                'classifications.name_en as classification_en',
+                'classifications.name_pt as classification_pt',
+                'classifications.name_it as classification_it',
                 'products.price_per_kg',
                 'products.net_price',
                 'products.weight_per_box',
@@ -52,16 +65,28 @@ class GenerateResportController extends Controller
             return $product;
         });
 
+        // Establecer el idioma para los PDFs
+        app()->setLocale($tariff->language ?? 'es');
+
 
         $products = $products->sortBy('sub_category_order');
 
+        $locale = app()->getLocale();
+        $categoryName = match ($locale) {
+            'en' => fn($product) => $product->category_en ?? $product->category,
+            'pt' => fn($product) => $product->category_pt ?? $product->category,
+            'it' => fn($product) => $product->category_it ?? $product->category,
+            default => fn($product) => $product->category,
+        };
 
-        $categories = $products->groupBy('category')->keys()->toArray();
+        $categories = $products->map($categoryName)->unique()->values()->toArray();
 
         $pages = [];
 
         foreach ($categories as $category) {
-            $productsPerCategory = $products->where('category', $category);
+            $productsPerCategory = $products->filter(function($product) use ($categoryName, $category) {
+                return ($categoryName($product) === $category);
+            });
             $pagedProducts = collect();
             $currentPage = 1;
             $currentCount = 0;
@@ -90,6 +115,7 @@ class GenerateResportController extends Controller
         $files[] = storage_path('app/private/cover.pdf');
 
         $pagesBackground = PageBackground::all();
+
         Pdf::loadView('pdf.cover', [
             'name' => $tariff->name,
             'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_1')->first()->background_image}"),
@@ -106,6 +132,8 @@ class GenerateResportController extends Controller
             $files[] = storage_path("app/private/page-{$i}.pdf");
             $currentProductsPage++;
         }
+
+
 
         Pdf::loadView('pdf.final', [
             'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_17')->first()->background_image}"),
@@ -160,6 +188,14 @@ class GenerateResportController extends Controller
 
     public function mapProduct($tariff, $product)
     {
+        $locale = app()->getLocale();
+        $classificationName = match ($locale) {
+            'en' => $product->classification_en ?? $product->classification,
+            'pt' => $product->classification_pt ?? $product->classification,
+            'it' => $product->classification_it ?? $product->classification,
+            default => $product->classification,
+        };
+
         $price_per_kg = $product->price_per_kg;
         $net_price = $product->net_price;
         $net_weight = $product->net_weight;
@@ -179,7 +215,7 @@ class GenerateResportController extends Controller
 
         $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
         return [
-            'classification' => $product->classification ?? 'Sin clasificación',
+            'classification' => $classificationName ?? 'Sin clasificación',
             'price_per_kg' => $product->is_available ? "{$price_per_kg} €" : '-',
             'weight_per_box' => $product->weight_per_box,
             'code' => $product->code,
@@ -199,8 +235,28 @@ class GenerateResportController extends Controller
 
     public function groupProducts($items, $tariff)
     {
-        return $items->groupBy('sub_category')->map(function ($item) use ($tariff) {
-            return $item->groupBy('glaze')->map(function ($item) use ($tariff) {
+        $locale = app()->getLocale();
+
+        $subCategoryName = match ($locale) {
+            'en' => fn($product) => $product->sub_category_en ?? $product->sub_category,
+            'pt' => fn($product) => $product->sub_category_pt ?? $product->sub_category,
+            'it' => fn($product) => $product->sub_category_it ?? $product->sub_category,
+            default => fn($product) => $product->sub_category,
+        };
+
+        $glazeName = match ($locale) {
+            'en' => fn($product) => $product->glaze_en ?? $product->glaze,
+            'pt' => fn($product) => $product->glaze_pt ?? $product->glaze,
+            'it' => fn($product) => $product->glaze_it ?? $product->glaze,
+            default => fn($product) => $product->glaze,
+        };
+
+        return $items->groupBy(function($item) use ($subCategoryName) {
+            return $subCategoryName($item);
+        })->map(function ($item) use ($glazeName, $tariff) {
+            return $item->groupBy(function($product) use ($glazeName) {
+                return $glazeName($product);
+            })->map(function ($item) use ($tariff) {
                 return $item->map(function ($item) use ($tariff) {
                     return $this->mapProduct($tariff, $item);
                 });

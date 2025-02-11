@@ -59,22 +59,41 @@
         @foreach ($data as $key => $value)
             <h3 style="font-size: 14px; margin-bottom: 0px">{{  $key }}</h3>
             @foreach ($value as $keyProduct => $products)
-                <h4 class="glaze-title">Glaseo: {{ $keyProduct }}</h4>
+                <h4 class="glaze-title">
+                    @lang('reports.titles.glaze')
+                    {{ $keyProduct }}
+                </h4>
                 <table>
                     <thead>
                         <tr>
-                            <th style="font-size: 8px;">Clasificacion</th>
-                            <th style="font-size: 8px;">Precio</th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.classification')
+                            </th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.price_per_kg')
+                            </th>
                             @if ($tariff->include_net_columns)
-                                <th style="font-size: 8px;">Precio neto</th>
+                                <th style="font-size: 8px;">
+                                    @lang('reports.columns.net_price')
+                                </th>
                             @endif
-                            <th style="font-size: 8px;">Peso</th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.weight_per_box')
+                            </th>
                             @if ($tariff->include_net_columns)
-                                <th style="font-size: 8px;">Peso neto</th>
+                                <th style="font-size: 8px;">
+                                    @lang('reports.columns.net_weight')
+                                </th>
                             @endif
-                            <th style="font-size: 8px;">Codigo</th>
-                            <th style="font-size: 8px;">Cajas</th>
-                            <th style="font-size: 8px;">Pal.</th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.code')
+                            </th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.quantity_boxes')
+                            </th>
+                            <th style="font-size: 8px;">
+                                @lang('reports.columns.palette_dimensions')
+                            </th>
                         </tr>
                     </thead>
                     @foreach ($products as $product)

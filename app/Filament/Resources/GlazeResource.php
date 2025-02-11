@@ -35,6 +35,15 @@ class GlazeResource extends Resource
                     ->label('Porcentaje')
                     ->required()
                     ->integer(),
+                Forms\Components\TextInput::make('name_en')
+                    ->label('Nombre en inglés')
+                    ->required(),
+                Forms\Components\TextInput::make('name_pt')
+                    ->label('Nombre en portugués')
+                    ->required(),
+                Forms\Components\TextInput::make('name_it')
+                    ->label('Nombre en italiano')
+                    ->required(),
             ])->columns(1);
     }
 

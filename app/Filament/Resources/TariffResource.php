@@ -41,6 +41,15 @@ class TariffResource extends Resource
                         false => 'No',
                     ])
                     ->default(false),
+                Forms\Components\Select::make('language')
+                    ->label('Idioma')
+                    ->options([
+                        'es' => 'Español',
+                        'en' => 'Inglés',
+                        'pt' => 'Portugués',
+                        'it' => 'Italiano',
+                    ])
+                    ->default('es'),
             ])->columns(1);
     }
 
@@ -52,6 +61,16 @@ class TariffResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('language')
+                    ->label('Idioma')
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            'es' => 'Español',
+                            'en' => 'Inglés',
+                            'pt' => 'Portugués',
+                            'it' => 'Italiano',
+                        };
+                    }),
                 Tables\Columns\TextColumn::make('increase_amount')
                     ->label('Monto de incremento')
                     ->numeric()

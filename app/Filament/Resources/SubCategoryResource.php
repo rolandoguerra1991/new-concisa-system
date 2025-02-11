@@ -48,6 +48,15 @@ class SubCategoryResource extends Resource
                     ->disabled(function (Get $get) {
                         return ! filled($get('category_id'));
                     }),
+                Forms\Components\TextInput::make('name_en')
+                    ->label('Nombre en inglés')
+                    ->required(),
+                Forms\Components\TextInput::make('name_pt')
+                    ->label('Nombre en portugués')
+                    ->required(),
+                Forms\Components\TextInput::make('name_it')
+                    ->label('Nombre en italiano')
+                    ->required(),
             ])->columns(1);
     }
 

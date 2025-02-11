@@ -11,6 +11,7 @@ class Tariff extends Model
         'increase_amount',
         'increase_percentage',
         'include_net_columns',
+        'language',
     ];
 
     protected function casts(): array
@@ -20,6 +21,7 @@ class Tariff extends Model
             'increase_amount' => 'decimal:2',
             'increase_percentage' => 'integer',
             'include_net_columns' => 'boolean',
+            'language' => 'string',
         ];
     }
 }
