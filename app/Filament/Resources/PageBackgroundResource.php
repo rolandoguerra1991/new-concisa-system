@@ -12,6 +12,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Validation\Rules\Unique;
+use Filament\Forms\Get;
 
 class PageBackgroundResource extends Resource
 {
@@ -48,8 +50,30 @@ class PageBackgroundResource extends Resource
                     ->unique(
                         table: PageBackground::class,
                         ignoreRecord: true,
+                        modifyRuleUsing: function (Unique $rule, Get $get) {
+                            return $rule->where('language', $get('language'))
+                                ->where('page', $get('page'));
+                        }
                     )
                     ->required(),
+                Forms\Components\Radio::make('language')
+                    ->label('Idioma')
+                    ->options([
+                        'es' => 'Español',
+                        'en' => 'Inglés',
+                        'it' => 'Italiano',
+                        'pt' => 'Portugués'
+                    ])
+                    ->required()
+                    ->default('es')
+                    ->unique(
+                        table: PageBackground::class,
+                        ignoreRecord: true,
+                        modifyRuleUsing: function (Unique $rule, Get $get) {
+                            return $rule->where('language', $get('language'))
+                                ->where('page', $get('page'));
+                        }
+                    ),
                 Forms\Components\FileUpload::make('background_image')
                     ->image()
                     ->required(),
@@ -64,8 +88,35 @@ class PageBackgroundResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('background_image')
                 ->label('Imagen de fondo'),
+                Tables\Columns\TextColumn::make('language')
+                    ->label('Idioma')
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'es' => 'Español',
+                        'en' => 'Inglés',
+                        'it' => 'Italiano',
+                        'pt' => 'Portugués',
+                    }),
                 Tables\Columns\TextColumn::make('page')
-                    ->label('Página'),
+                    ->label('Página')
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'page_1' => 'Página 1',
+                        'page_2' => 'Página 2',
+                        'page_3' => 'Página 3',
+                        'page_4' => 'Página 4',
+                        'page_5' => 'Página 5',
+                        'page_6' => 'Página 6',
+                        'page_7' => 'Página 7',
+                        'page_8' => 'Página 8',
+                        'page_9' => 'Página 9',
+                        'page_10' => 'Página 10',
+                        'page_11' => 'Página 11',
+                        'page_12' => 'Página 12',
+                        'page_13' => 'Página 13',
+                        'page_14' => 'Página 14',
+                        'page_15' => 'Página 15',
+                        'page_16' => 'Página 16',
+                        'page_17' => 'Página 17',
+                    }),
             ])
             ->filters([
                 //

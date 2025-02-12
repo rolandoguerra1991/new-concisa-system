@@ -41,7 +41,7 @@ class TariffResource extends Resource
                         false => 'No',
                     ])
                     ->default(false),
-                Forms\Components\Select::make('language')
+                Forms\Components\Radio::make('language')
                     ->label('Idioma')
                     ->options([
                         'es' => 'Español',

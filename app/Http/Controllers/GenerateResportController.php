@@ -116,14 +116,32 @@ class GenerateResportController extends Controller
 
         $pagesBackground = PageBackground::all();
 
+        $pageBackgroundCover = $pagesBackground
+            ->where('page', 'page_1')
+            ->where(function($query) use ($tariff) {
+                return match($query->where('language', $tariff->language)->exists()) {
+                    true => $query->where('language', $tariff->language),
+                    false => $query->where('language', 'es')
+                };
+            })
+            ->first();
+
         Pdf::loadView('pdf.cover', [
             'name' => $tariff->name,
-            'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_1')->first()->background_image}"),
+            'background' => storage_path("app/public/{$pageBackgroundCover->background_image}"),
         ])->save('cover.pdf', 'local');
 
         $currentProductsPage = 2;
         for ($i=0; $i < count($pages); $i++) {
-            $pageBackground = $pagesBackground->where('page', "page_{$currentProductsPage}")->first();
+            $pageBackground = $pagesBackground
+                ->where('page', "page_{$currentProductsPage}")
+                ->where(function($query) use ($tariff) {
+                    return match($query->where('language', $tariff->language)->exists()) {
+                        true => $query->where('language', $tariff->language),
+                        false => $query->where('language', 'es')
+                    };
+                })
+                ->first();
             Pdf::loadView('pdf.page', [
                 'background' => storage_path("app/public/{$pageBackground->background_image}"),
                 'tariff' => $tariff,
@@ -133,10 +151,18 @@ class GenerateResportController extends Controller
             $currentProductsPage++;
         }
 
-
+        $pageBackgroundFinal = $pagesBackground
+            ->where('page', 'page_17')
+            ->where(function($query) use ($tariff) {
+                return match($query->where('language', $tariff->language)->exists()) {
+                    true => $query->where('language', $tariff->language),
+                    false => $query->where('language', 'es')
+                };
+            })
+            ->first();
 
         Pdf::loadView('pdf.final', [
-            'background' => storage_path("app/public/{$pagesBackground->where('page', 'page_17')->first()->background_image}"),
+            'background' => storage_path("app/public/{$pageBackgroundFinal->background_image}"),
         ])->save('final.pdf', 'local');
 
         $files[] = storage_path('app/private/final.pdf');
