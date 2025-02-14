@@ -13,7 +13,7 @@ class TariffPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**
@@ -21,7 +21,7 @@ class TariffPolicy
      */
     public function view(User $user, Tariff $tariff): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**

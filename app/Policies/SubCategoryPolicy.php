@@ -13,7 +13,7 @@ class SubCategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**
@@ -21,7 +21,7 @@ class SubCategoryPolicy
      */
     public function view(User $user, SubCategory $subCategory): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**

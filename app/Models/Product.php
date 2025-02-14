@@ -18,7 +18,7 @@ class Product extends Model
         'sub_category_id',
         'net_price',
         'net_weight',
-        'is_available'
+        'is_available',
     ];
 
     protected function casts(): array
@@ -29,13 +29,13 @@ class Product extends Model
             'code' => 'string',
             'quantity_boxes' => 'integer',
             'price_per_kg' => 'decimal:2',
-            'weight_per_box' => 'integer',
+            'weight_per_box' => 'decimal:2',
             'palette_dimensions' => 'string',
             'category_id' => 'integer',
             'sub_category_id' => 'integer',
             'net_price' => 'decimal:2',
             'net_weight' => 'decimal:2',
-            'is_available' => 'boolean'
+            'is_available' => 'boolean',
         ];
     }
 

@@ -13,7 +13,7 @@ class GlazePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**
@@ -21,7 +21,7 @@ class GlazePolicy
      */
     public function view(User $user, Glaze $glaze): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**

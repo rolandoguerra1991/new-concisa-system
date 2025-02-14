@@ -48,10 +48,12 @@ class UserResource extends Resource
                     ->options([
                         'admin' => 'Administrador',
                         'editor' => 'Editor',
+                        'consultant' => 'Consultor',
                     ])
                     ->descriptions([
                         'admin' => 'Acceso total a la aplicación.',
-                        'editor' => 'Solo es capaz de editar, buscar y generar reportes.',
+                        'editor' => 'Solo es capaz de editar precio productos, buscar y generar reportes.',
+                        'consultant' => 'Solo es capaz de buscar y generar reportes.',
                     ])->required()
             ])->columns(1);
     }

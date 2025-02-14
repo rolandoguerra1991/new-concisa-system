@@ -32,7 +32,7 @@ class ProductFinderItem extends Component implements HasForms, HasInfolists
                             ->label('Editar producto')
                             ->action(function () {
                                 redirect(ProductResource::getUrl('edit', ['record' => $this->product]));
-                            }),
+                            })->visible(fn () => auth()->user()->isAdmin()),
                     ])
                     ->schema([
                         TextEntry::make('category.name')

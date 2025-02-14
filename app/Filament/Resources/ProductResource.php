@@ -185,7 +185,7 @@ class ProductResource extends Resource
         return $table
             ->striped()
             ->columns([
-                Tables\Columns\ToggleColumn::make('is_available')->label('Disponible'),
+                Tables\Columns\ToggleColumn::make('is_available')->label('Disponible')->visible(fn () => auth()->user()->isAdmin()),
                 Tables\Columns\TextColumn::make('classification.name')->label('Clasificacion')->searchable(),
                 Tables\Columns\TextColumn::make('category.name')->label('Categoria principal')->searchable(),
                 Tables\Columns\TextColumn::make('subCategory.name')->label(label: 'Sub categoria')->searchable(),
@@ -218,7 +218,7 @@ class ProductResource extends Resource
                     ->constraints([
                         Filters\QueryBuilder\Constraints\NumberConstraint::make('net_price')
                             ->label('Precio neto')
-                            ->nullable()
+                            ->nullable(),
                     ]),
             ])
             ->actions([
@@ -236,7 +236,7 @@ class ProductResource extends Resource
                                 $record->update(['is_available' => true]);
                             }
                         }),
-                ]),
+                ])->visible(fn () => auth()->user()->isAdmin()),
             ]);
     }
 

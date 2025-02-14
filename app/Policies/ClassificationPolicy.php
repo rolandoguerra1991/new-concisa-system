@@ -13,7 +13,7 @@ class ClassificationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**
@@ -21,7 +21,7 @@ class ClassificationPolicy
      */
     public function view(User $user, Classification $classification): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isConsultant();
     }
 
     /**

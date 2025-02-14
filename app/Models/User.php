@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->role === 'editor';
     }
+
+    public function isConsultant(): bool
+    {
+        return $this->role === 'consultant';
+    }
 }

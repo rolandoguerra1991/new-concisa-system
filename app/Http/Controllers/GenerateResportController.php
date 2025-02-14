@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\PageBackground;
 use App\Models\SubCategorySort;
 use App\Models\Tariff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use setasign\Fpdi\Fpdi;
 
 class GenerateResportController extends Controller
@@ -58,25 +56,28 @@ class GenerateResportController extends Controller
 
         $subCategoryOrder = SubCategorySort::all();
 
-        $products->map(function ($product) use ($subCategoryOrder) {
+        app()->setLocale($tariff->language ?? 'es');
+
+        $locale = app()->getLocale();
+
+        $products->map(function ($product) use ($subCategoryOrder, $locale) {
             $order = $subCategoryOrder->where('sub_category_id', $product->sub_category_id)->first();
             $product->sub_category_order = $order?->sort ?? 9999;
             $product->sub_category = "{$product->sub_category} - ({$product->fao})";
+            $product->sub_category_en = "{$product->sub_category_en} - ({$product->fao})";
+            $product->sub_category_pt = "{$product->sub_category_pt} - ({$product->fao})";
+            $product->sub_category_it = "{$product->sub_category_it} - ({$product->fao})";
+
             return $product;
         });
 
-        // Establecer el idioma para los PDFs
-        app()->setLocale($tariff->language ?? 'es');
-
-
         $products = $products->sortBy('sub_category_order');
 
-        $locale = app()->getLocale();
         $categoryName = match ($locale) {
-            'en' => fn($product) => $product->category_en ?? $product->category,
-            'pt' => fn($product) => $product->category_pt ?? $product->category,
-            'it' => fn($product) => $product->category_it ?? $product->category,
-            default => fn($product) => $product->category,
+            'en' => fn ($product) => $product->category_en ?? $product->category,
+            'pt' => fn ($product) => $product->category_pt ?? $product->category,
+            'it' => fn ($product) => $product->category_it ?? $product->category,
+            default => fn ($product) => $product->category,
         };
 
         $categories = $products->map($categoryName)->unique()->values()->toArray();
@@ -84,8 +85,8 @@ class GenerateResportController extends Controller
         $pages = [];
 
         foreach ($categories as $category) {
-            $productsPerCategory = $products->filter(function($product) use ($categoryName, $category) {
-                return ($categoryName($product) === $category);
+            $productsPerCategory = $products->filter(function ($product) use ($categoryName, $category) {
+                return $categoryName($product) === $category;
             });
             $pagedProducts = collect();
             $currentPage = 1;
@@ -118,8 +119,8 @@ class GenerateResportController extends Controller
 
         $pageBackgroundCover = $pagesBackground
             ->where('page', 'page_1')
-            ->where(function($query) use ($tariff) {
-                return match($query->where('language', $tariff->language)->exists()) {
+            ->where(function ($query) use ($tariff) {
+                return match ($query->where('language', $tariff->language)->exists()) {
                     true => $query->where('language', $tariff->language),
                     false => $query->where('language', 'es')
                 };
@@ -132,11 +133,11 @@ class GenerateResportController extends Controller
         ])->save('cover.pdf', 'local');
 
         $currentProductsPage = 2;
-        for ($i=0; $i < count($pages); $i++) {
+        for ($i = 0; $i < count($pages); $i++) {
             $pageBackground = $pagesBackground
                 ->where('page', "page_{$currentProductsPage}")
-                ->where(function($query) use ($tariff) {
-                    return match($query->where('language', $tariff->language)->exists()) {
+                ->where(function ($query) use ($tariff) {
+                    return match ($query->where('language', $tariff->language)->exists()) {
                         true => $query->where('language', $tariff->language),
                         false => $query->where('language', 'es')
                     };
@@ -153,8 +154,8 @@ class GenerateResportController extends Controller
 
         $pageBackgroundFinal = $pagesBackground
             ->where('page', 'page_17')
-            ->where(function($query) use ($tariff) {
-                return match($query->where('language', $tariff->language)->exists()) {
+            ->where(function ($query) use ($tariff) {
+                return match ($query->where('language', $tariff->language)->exists()) {
                     true => $query->where('language', $tariff->language),
                     false => $query->where('language', 'es')
                 };
@@ -240,6 +241,7 @@ class GenerateResportController extends Controller
         }
 
         $price_per_kg = $this->roundToFiveOrZero($price_per_kg);
+
         return [
             'classification' => $classificationName ?? 'Sin clasificación',
             'price_per_kg' => $product->is_available ? "{$price_per_kg} €" : '-',
@@ -264,23 +266,23 @@ class GenerateResportController extends Controller
         $locale = app()->getLocale();
 
         $subCategoryName = match ($locale) {
-            'en' => fn($product) => $product->sub_category_en ?? $product->sub_category,
-            'pt' => fn($product) => $product->sub_category_pt ?? $product->sub_category,
-            'it' => fn($product) => $product->sub_category_it ?? $product->sub_category,
-            default => fn($product) => $product->sub_category,
+            'en' => fn ($product) => $product->sub_category_en ?? $product->sub_category,
+            'pt' => fn ($product) => $product->sub_category_pt ?? $product->sub_category,
+            'it' => fn ($product) => $product->sub_category_it ?? $product->sub_category,
+            default => fn ($product) => $product->sub_category,
         };
 
         $glazeName = match ($locale) {
-            'en' => fn($product) => $product->glaze_en ?? $product->glaze,
-            'pt' => fn($product) => $product->glaze_pt ?? $product->glaze,
-            'it' => fn($product) => $product->glaze_it ?? $product->glaze,
-            default => fn($product) => $product->glaze,
+            'en' => fn ($product) => $product->glaze_en ?? $product->glaze,
+            'pt' => fn ($product) => $product->glaze_pt ?? $product->glaze,
+            'it' => fn ($product) => $product->glaze_it ?? $product->glaze,
+            default => fn ($product) => $product->glaze,
         };
 
-        return $items->groupBy(function($item) use ($subCategoryName) {
+        return $items->groupBy(function ($item) use ($subCategoryName) {
             return $subCategoryName($item);
         })->map(function ($item) use ($glazeName, $tariff) {
-            return $item->groupBy(function($product) use ($glazeName) {
+            return $item->groupBy(function ($product) use ($glazeName) {
                 return $glazeName($product);
             })->map(function ($item) use ($tariff) {
                 return $item->map(function ($item) use ($tariff) {
