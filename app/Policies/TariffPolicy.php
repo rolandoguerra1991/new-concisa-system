@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Tariff;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TariffPolicy
 {
@@ -13,7 +12,7 @@ class TariffPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isConsultant();
+        return $user->isAdmin() || $user->isConsultant() || $user->isEditor();
     }
 
     /**

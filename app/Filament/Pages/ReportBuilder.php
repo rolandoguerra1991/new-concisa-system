@@ -13,4 +13,9 @@ class ReportBuilder extends Page
     protected static ?string $title = 'Ajustes de reporte';
 
     protected static ?int $navigationSort = 1000;
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->isAdmin();
+    }
 }

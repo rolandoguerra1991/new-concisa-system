@@ -2,16 +2,16 @@
 
 return [
     'columns' => [
-        'classification' => 'Classificazione',
+        'classification' => 'Descrizione',
         'price_per_kg' => 'Prezzo',
-        'weight_per_box' => 'Peso',
+        'weight_per_box' => 'Imballaggio',
         'code' => 'Codice',
-        'quantity_boxes' => 'Casse',
-        'palette_dimensions' => 'Pal.',
+        'quantity_boxes' => 'Cts',
+        'palette_dimensions' => 'Plt',
         'net_price' => 'Prezzo netto',
         'net_weight' => 'Peso netto',
     ],
     'titles' => [
-        'glaze' => 'Glasatura',
-    ]
+        'glaze' => 'Glassatura',
+    ],
 ];
